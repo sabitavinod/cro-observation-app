@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MGS Classroom Observation</title>
+<style>
+  :root {
+    --blue: #1a3c6e;
+    --blue-mid: #2e6da4;
+    --blue-light: #e8f0f9;
+    --green: #1e7e34;
+    --green-light: #d4edda;
+    --red: #c0392b;
+    --red-light: #fdecea;
+    --orange: #e67e22;
+    --orange-light: #fef3e2;
+    --gray: #6c757d;
+    --gray-light: #f8f9fa;
+    --border: #dee2e6;
+    --white: #ffffff;
+    --shadow: 0 2px 12px rgba(0,0,0,0.1);
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #333; min-height: 100vh; }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: var(--blue);
+    color: white;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  .app-header h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.3px; }
+  .app-header .user-info { font-size: 12px; opacity: 0.85; text-align: right; }
+  .app-header .user-info span { display: block; }
+  .btn-logout { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    color: white; padding: 4px 10px; border-radius: 5px; font-size: 11px; cursor: pointer; margin-top: 4px; }
+  .btn-logout:hover { background: rgba(255,255,255,0.25); }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── LOGIN ── */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a3c6e 0%, #2e6da4 100%);
+    padding: 20px;
+  }
+  .login-card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+  .login-logo { font-size: 48px; margin-bottom: 12px; }
+  .login-card h2 { color: var(--blue); font-size: 22px; margin-bottom: 4px; }
+  .login-card p { color: var(--gray); font-size: 13px; margin-bottom: 28px; }
+  .login-card input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    margin-bottom: 14px;
+    transition: border 0.2s;
+    outline: none;
+  }
+  .login-card input:focus { border-color: var(--blue-mid); }
+  .btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: var(--blue-mid); }
+  .btn-primary:disabled { background: #aaa; cursor: not-allowed; }
+  .login-error { color: var(--red); font-size: 13px; margin-top: 10px; }
+
+  /* ── MAIN LAYOUT ── */
+  .main-content { padding: 16px; max-width: 700px; margin: 0 auto; }
+
+  /* ── NAV TABS ── */
+  .nav-tabs {
+    display: flex;
+    background: white;
+    border-radius: var(--radius);
+    padding: 6px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    gap: 4px;
+  }
+  .nav-tab {
+    flex: 1;
+    min-width: 80px;
+    padding: 9px 8px;
+    text-align: center;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--gray);
+    border: none;
+    background: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-tab.active { background: var(--blue); color: white; }
+  .nav-tab:hover:not(.active) { background: var(--blue-light); color: var(--blue); }
+
+  /* ── CARDS ── */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--blue);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--blue-light);
+  }
+
+  /* ── FORM ELEMENTS ── */
+  .form-group { margin-bottom: 14px; }
+  .form-label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 5px; }
+  .form-label .req { color: var(--red); }
+  .form-control {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    outline: none;
+    transition: border 0.2s;
+    appearance: none;
+  }
+  .form-control:focus { border-color: var(--blue-mid); }
+  .form-control:disabled { background: var(--gray-light); color: var(--gray); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-hint { font-size: 11px; color: var(--gray); margin-top: 3px; }
+
+  /* ── RATING BUTTONS ── */
+  .rating-group { margin-bottom: 16px; }
+  .rating-label { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 6px; }
+  .rating-area-name { font-size: 13px; color: var(--blue); font-weight: 600; }
+  .rating-btns { display: flex; gap: 8px; margin: 8px 0; }
+  .rating-btn {
+    flex: 1;
+    padding: 10px 4px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .rating-btn:hover { border-color: var(--blue-mid); background: var(--blue-light); }
+  .rating-btn.selected-4 { background: #1e7e34; border-color: #1e7e34; color: white; }
+  .rating-btn.selected-3 { background: #2e6da4; border-color: #2e6da4; color: white; }
+  .rating-btn.selected-2 { background: #e67e22; border-color: #e67e22; color: white; }
+  .rating-btn.selected-1 { background: #c0392b; border-color: #c0392b; color: white; }
+  .rating-desc { font-size: 11px; color: var(--gray); }
+
+  /* ── RECORDING ── */
+  .record-section {
+    background: linear-gradient(135deg, #1a3c6e, #2e6da4);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    color: white;
+    margin-bottom: 14px;
+  }
+  .record-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .record-subtitle { font-size: 12px; opacity: 0.8; margin-bottom: 16px; }
+  .record-timer { font-size: 32px; font-weight: 700; font-family: monospace; margin: 10px 0; letter-spacing: 2px; }
+  .record-status { font-size: 12px; margin-bottom: 14px; opacity: 0.85; }
+  .btn-record {
+    padding: 13px 28px;
+    border-radius: 30px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 4px;
+  }
+  .btn-record-start { background: #e74c3c; color: white; }
+  .btn-record-start:hover { background: #c0392b; }
+  .btn-record-stop { background: #f39c12; color: white; }
+  .btn-record-stop:hover { background: #d68910; }
+  .btn-record:disabled { background: #aaa; cursor: not-allowed; }
+  .record-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    background: #e74c3c; margin-right: 6px; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  .record-ready { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; font-size: 12px; margin-top: 10px; }
+
+  /* ── TOGGLE ── */
+  .toggle-group { display: flex; gap: 8px; }
+  .toggle-btn {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .toggle-btn.selected-yes { background: var(--red); border-color: var(--red); color: white; }
+  .toggle-btn.selected-no { background: var(--green); border-color: var(--green); color: white; }
+
+  /* ── BUTTONS ── */
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s;
+  }
+  .btn-submit:hover { background: #155724; }
+  .btn-submit:disabled { background: #aaa; cursor: not-allowed; }
+  .btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    color: var(--blue);
+    border: 2px solid var(--blue);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: var(--blue-light); }
+  .btn-danger {
+    padding: 10px 18px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .btn-success {
+    padding: 10px 18px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  /* ── STATUS BADGES ── */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-submitted { background: #cce5ff; color: #004085; }
+  .badge-acknowledged { background: var(--green-light); color: #155724; }
+  .badge-action { background: var(--orange-light); color: #7d4e00; }
+  .badge-closed { background: #e2e3e5; color: #383d41; }
+  .badge-revision { background: var(--red-light); color: #721c24; }
+
+  /* ── DASHBOARD STATS ── */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .stat-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 14px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .stat-number { font-size: 28px; font-weight: 700; color: var(--blue); }
+  .stat-label { font-size: 11px; color: var(--gray); margin-top: 2px; }
+
+  /* ── RECORD ITEMS ── */
+  .record-item {
+    background: white;
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--blue-mid);
+  }
+  .record-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .record-item-title { font-size: 14px; font-weight: 600; color: var(--blue); }
+  .record-item-sub { font-size: 12px; color: var(--gray); margin-top: 2px; }
+  .record-item-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+  /* ── SCORE DISPLAY ── */
+  .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+  .score-item { background: var(--blue-light); border-radius: 7px; padding: 8px 10px; }
+  .score-item-label { font-size: 11px; color: var(--blue); font-weight: 600; }
+  .score-item-val { font-size: 18px; font-weight: 700; color: var(--blue); }
+
+  /* ── LOADING ── */
+  .loading { text-align: center; padding: 40px 20px; color: var(--gray); }
+  .spinner { width: 36px; height: 36px; border: 3px solid var(--border);
+    border-top: 3px solid var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #333; color: white; padding: 12px 20px; border-radius: 8px;
+    font-size: 13px; z-index: 9999; display: none; max-width: 320px; text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  #toast.success { background: var(--green); }
+  #toast.error { background: var(--red); }
+
+  /* ── EMPTY STATE ── */
+  .empty { text-align: center; padding: 40px 20px; color: var(--gray); }
+  .empty-icon { font-size: 40px; margin-bottom: 10px; }
+
+  /* ── SECTION HEADER ── */
+  .section-header { font-size: 13px; font-weight: 600; color: var(--gray); text-transform: uppercase;
+    letter-spacing: 0.5px; margin: 16px 0 8px; }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:400px) {
+    .form-row { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ TOAST ══ -->
+<div id="toast"></div>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="screen-login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">🏫</div>
+      <h2>MGS Classroom Observation</h2>
+      <p>Meghe Group of Schools</p>
+      <input type="email" id="login-email" placeholder="Enter your school email" autocomplete="email" />
+      <button class="btn-primary" onclick="doLogin()">Sign In</button>
+      <div class="login-error" id="login-error"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="screen-app" class="screen">
+  <div class="app-header">
+    <h1>MGS Classroom Observation</h1>
+    <div class="user-info">
+      <span id="header-name">—</span>
+      <span id="header-role">—</span>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- NAV TABS — rendered by JS based on role -->
+  <div class="main-content">
+    <div class="nav-tabs" id="nav-tabs"></div>
+    <div id="tab-content"></div>
+  </div>
+</div>
+
+<!-- ══ LOADING SCREEN ══ -->
+<div id="screen-loading" class="screen">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>Loading...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONFIGURATION
+// ══════════════════════════════════════════════════════
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwL6Qy1dfCrJrKEUTK2IBbq1YogPS4KsIYzRx8u3O8--IbgZswiNtiJU7Spkt7Tvl5lBQ/exec";
+
+const AREA_NAMES = [
+  "Implementation of Pedagogy",
+  "Student Involvement",
+  "Language and Subject-Specific Terminology",
+  "Learning Environment",
+  "Utility of Resources"
+];
+
+const RATING_LABELS = {
+  4: "4 — Exemplary",
+  3: "3 — Proficient",
+  2: "2 — Progressing",
+  1: "1 — Beginner"
+};
+
+// ══════════════════════════════════════════════════════
+// APP STATE
+// ══════════════════════════════════════════════════════
+let APP = {
+  user: null,
+  currentTab: null,
+  formData: {},
+  recording: { mediaRecorder: null, chunks: [], blob: null, timerInterval: null, seconds: 0, active: false },
+  cache: { teachers: [], assignments: [], records: [], actions: [] }
+};
+
+// ══════════════════════════════════════════════════════
+// SCREEN MANAGEMENT
+// ══════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = type;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3200);
+}
+
+// ══════════════════════════════════════════════════════
+// API CALLS
+// ══════════════════════════════════════════════════════
+async function apiGet(params) {
+  const url = SCRIPT_URL + '?' + new URLSearchParams(params);
+  const res = await fetch(url);
+  return res.json();
+}
+
+async function apiPost(body) {
+  const res = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+// ══════════════════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════════════════
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+
+  if (!email) { errEl.textContent = 'Please enter your email.'; return; }
+  if (!email.endsWith('@mgsnagpur.org')) {
+    errEl.textContent = 'Please use your @mgsnagpur.org school email.'; return;
+  }
+
+  showScreen('loading');
+  try {
+    const res = await apiGet({ action: 'getUser', email });
+    if (res.status === 'success' && res.user.isActive === 'TRUE') {
+      APP.user = res.user;
+      initApp();
+    } else {
+      showScreen('login');
+      errEl.textContent = res.status === 'success'
+        ? 'Your account is inactive. Please contact the School Admin.'
+        : 'Email not found. Please contact the School Admin.';
+    }
+  } catch (err) {
+    showScreen('login');
+    errEl.textContent = 'Connection error. Please try again.';
+  }
+}
+
+document.getElementById('login-email').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+function doLogout() {
+  APP = { user: null, currentTab: null, formData: {},
+    recording: { mediaRecorder: null, chunks: [], blob: null, timerInterval: null, seconds: 0, active: false },
+    cache: { teachers: [], assignments: [], records: [], actions: [] }
+  };
+  document.getElementById('login-email').value = '';
+  showScreen('login');
+}
+
+// ══════════════════════════════════════════════════════
+// INIT APP AFTER LOGIN
+// ══════════════════════════════════════════════════════
+function initApp() {
+  const u = APP.user;
+  document.getElementById('header-name').textContent = u.fullName;
+  document.getElementById('header-role').textContent = u.role + ' — ' + u.schoolName;
+
+  const tabs = getTabsForRole(u.role);
+  renderNavTabs(tabs);
+  showScreen('app');
+  switchTab(tabs[0].id);
+}
+
+function getTabsForRole(role) {
+  const observer = ['HOD','Coordinator','Supervisor','Principal','VicePrincipal','PPHead'];
+  const tabs = [];
+
+  if (observer.includes(role)) {
+    tabs.push({ id: 'new-cro', label: '📋 New CRO' });
+    tabs.push({ id: 'my-cros', label: '📁 My CROs' });
+    tabs.push({ id: 'verify', label: '✅ Verify' });
+    tabs.push({ id: 'dashboard', label: '📊 Dashboard' });
+  }
+  if (role === 'Teacher') {
+    tabs.push({ id: 'my-reports', label: '📄 My Reports' });
+    tabs.push({ id: 'pending-ack', label: '🔔 Acknowledge' });
+    tabs.push({ id: 'action-taken', label: '📝 Action Taken' });
+  }
+  if (role === 'SchoolAdmin') {
+    tabs.push({ id: 'manage-users', label: '👥 Manage Users' });
+    tabs.push({ id: 'dashboard', label: '📊 Dashboard' });
+  }
+  if (role === 'SuperAdmin') {
+    tabs.push({ id: 'bulk-upload', label: '⬆️ Bulk Upload' });
+    tabs.push({ id: 'manage-users', label: '👥 Manage Users' });
+    tabs.push({ id: 'dashboard', label: '📊 Dashboard' });
+  }
+  if (role === 'Management') {
+    tabs.push({ id: 'dashboard', label: '📊 Dashboard' });
+  }
+  return tabs;
+}
+
+function renderNavTabs(tabs) {
+  const el = document.getElementById('nav-tabs');
+  el.innerHTML = tabs.map(t =>
+    `<button class="nav-tab" data-id="${t.id}" onclick="switchTab('${t.id}')">${t.label}</button>`
+  ).join('');
+}
+
+function switchTab(id) {
+  APP.currentTab = id;
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.id === id);
+  });
+  renderTab(id);
+}
+
+async function renderTab(id) {
+  const el = document.getElementById('tab-content');
+  el.innerHTML = `<div class="loading"><div class="spinner"></div><div>Loading...</div></div>`;
+
+  if (id === 'new-cro')      await renderNewCROForm(el);
+  else if (id === 'my-cros') await renderMyCROs(el);
+  else if (id === 'verify')  await renderVerify(el);
+  else if (id === 'dashboard') await renderDashboard(el);
+  else if (id === 'my-reports') await renderMyReports(el);
+  else if (id === 'pending-ack') await renderPendingAck(el);
+  else if (id === 'action-taken') await renderActionTaken(el);
+  else if (id === 'manage-users') renderManageUsers(el);
+  else if (id === 'bulk-upload') renderBulkUpload(el);
+  else el.innerHTML = `<div class="empty"><div class="empty-icon">🚧</div>Coming soon</div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// NEW CRO FORM
+// ══════════════════════════════════════════════════════
+async function renderNewCROForm(el) {
+  // Load teachers for this observer
+  try {
+    const res = await apiGet({ action: 'getTeachers', observerEmail: APP.user.email });
+    APP.cache.teachers = res.teachers || [];
+  } catch(e) { APP.cache.teachers = []; }
+
+  const teacherOptions = APP.cache.teachers.map(t =>
+    `<option value="${t.teacherEmail}">${t.teacherName}</option>`
+  ).join('');
+
+  el.innerHTML = `
+    <!-- RECORDING SECTION -->
+    <div class="record-section">
+      <div class="record-title">🎙️ Class Recording</div>
+      <div class="record-subtitle">Start recording before the class begins</div>
+      <div class="record-timer" id="rec-timer">00:00</div>
+      <div class="record-status" id="rec-status">Ready to record</div>
+      <div>
+        <button class="btn-record btn-record-start" id="btn-start-rec" onclick="startRecording()">⏺ Start Recording</button>
+        <button class="btn-record btn-record-stop" id="btn-stop-rec" onclick="stopRecording()" disabled>⏹ Stop Recording</button>
+      </div>
+      <div class="record-ready" id="rec-ready" style="display:none">✅ Recording saved — ready to submit</div>
+    </div>
+
+    <!-- TEACHER DETAILS -->
+    <div class="card">
+      <div class="card-title">Teacher and Class Details</div>
+      <div class="form-group">
+        <label class="form-label">Teacher <span class="req">*</span></label>
+        <select class="form-control" id="f-teacher" onchange="onTeacherChange()">
+          <option value="">— Select Teacher —</option>
+          ${teacherOptions}
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Class</label>
+          <select class="form-control" id="f-class" onchange="onClassChange()">
+            <option value="">— Select —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Section</label>
+          <select class="form-control" id="f-section">
+            <option value="">— Select —</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <input class="form-control" id="f-subject" readonly placeholder="Auto-filled" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject Type</label>
+          <input class="form-control" id="f-subjecttype" readonly placeholder="Auto-filled" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Topic / Subtopic <span class="req">*</span></label>
+        <input class="form-control" id="f-topic" placeholder="Enter topic taught" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Period / Time</label>
+          <input class="form-control" id="f-period" placeholder="e.g. Period 3 / 10:00 AM" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">CRO Type</label>
+          <select class="form-control" id="f-crotype">
+            <option value="Regular">Regular</option>
+            <option value="Follow-up">Follow-up</option>
+            <option value="Special Programme">Special Programme</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- RUBRIC -->
+    <div class="card">
+      <div class="card-title">Observation Ratings</div>
+      <div style="background:var(--blue-light);border-radius:8px;padding:10px;margin-bottom:14px;font-size:12px;color:var(--blue);">
+        <strong>Rating Scale:</strong> 4 = Exemplary &nbsp;|&nbsp; 3 = Proficient &nbsp;|&nbsp; 2 = Progressing &nbsp;|&nbsp; 1 = Beginner
+      </div>
+      ${AREA_NAMES.map((name, i) => `
+        <div class="rating-group">
+          <div class="rating-area-name">${i+1}. ${name}</div>
+          <div class="rating-btns">
+            ${[4,3,2,1].map(r => `
+              <button class="rating-btn" id="rate-${i+1}-${r}" onclick="setRating(${i+1}, ${r})">${r}</button>
+            `).join('')}
+          </div>
+          <input class="form-control" id="rem-${i+1}" placeholder="Remarks (optional)" style="font-size:13px;" />
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="card">
+      <div class="card-title">Overall Observation Summary</div>
+      <div class="form-group">
+        <label class="form-label">Good Practices Identified <span class="req">*</span></label>
+        <textarea class="form-control" id="f-good" rows="2" placeholder="What went well in this class?"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Areas for Improvement</label>
+        <textarea class="form-control" id="f-improve" rows="2" placeholder="What can be improved?"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Support Needed</label>
+        <textarea class="form-control" id="f-support" rows="2" placeholder="What support does the teacher need?"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Follow-up Required? <span class="req">*</span></label>
+        <div class="toggle-group">
+          <button class="toggle-btn" id="tog-yes" onclick="setFollowup('Yes')">Yes — Action Required</button>
+          <button class="toggle-btn" id="tog-no" onclick="setFollowup('No')">No — Close after acknowledgement</button>
+        </div>
+      </div>
+      <div class="form-group" id="due-date-group" style="display:none">
+        <label class="form-label">Action Due Date</label>
+        <input class="form-control" type="date" id="f-duedate" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Best Practice — Shareable?</label>
+        <div class="toggle-group">
+          <button class="toggle-btn" id="tog-bp-yes" onclick="setBestPrac('Yes')">Yes</button>
+          <button class="toggle-btn" id="tog-bp-no" onclick="setBestPrac('No')">No</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="btn-submit-cro" onclick="submitCRO()">✅ Submit CRO Report</button>
+    <div style="height:30px;"></div>
+  `;
+
+  // defaults
+  APP.formData = { followUp: '', bestPrac: '', ratings: {} };
+  setFollowup('No');
+  setBestPrac('No');
+}
+
+// Teacher change — load assignments
+async function onTeacherChange() {
+  const teacherEmail = document.getElementById('f-teacher').value;
+  if (!teacherEmail) return;
+
+  const classEl = document.getElementById('f-class');
+  classEl.innerHTML = '<option>Loading...</option>';
+
+  try {
+    const res = await apiGet({ action: 'getAssignments', teacherEmail, observerEmail: APP.user.email });
+    APP.cache.assignments = res.assignments || [];
+
+    // Unique classes
+    const classes = [...new Set(APP.cache.assignments.map(a => a.class))];
+    classEl.innerHTML = '<option value="">— Select Class —</option>' +
+      classes.map(c => `<option value="${c}">${c}</option>`).join('');
+
+    document.getElementById('f-section').innerHTML = '<option value="">— Select —</option>';
+    document.getElementById('f-subject').value = '';
+    document.getElementById('f-subjecttype').value = '';
+  } catch(e) {
+    classEl.innerHTML = '<option value="">— Select Class —</option>';
+  }
+}
+
+function onClassChange() {
+  const cls = document.getElementById('f-class').value;
+  const matching = APP.cache.assignments.filter(a => a.class === cls);
+
+  const sections = [...new Set(matching.map(a => a.section))];
+  document.getElementById('f-section').innerHTML =
+    '<option value="">— Select —</option>' +
+    sections.map(s => `<option value="${s}">${s}</option>`).join('');
+
+  // auto-fill subject if only one
+  if (matching.length > 0) {
+    document.getElementById('f-subject').value = matching[0].subject;
+    document.getElementById('f-subjecttype').value = matching[0].subjectType;
+  }
+}
+
+function setRating(area, val) {
+  APP.formData.ratings[area] = val;
+  for (let r = 1; r <= 4; r++) {
+    const btn = document.getElementById(`rate-${area}-${r}`);
+    btn.className = 'rating-btn' + (r === val ? ` selected-${r}` : '');
+  }
+}
+
+function setFollowup(val) {
+  APP.formData.followUp = val;
+  document.getElementById('tog-yes').className = 'toggle-btn' + (val === 'Yes' ? ' selected-yes' : '');
+  document.getElementById('tog-no').className = 'toggle-btn' + (val === 'No' ? ' selected-no' : '');
+  document.getElementById('due-date-group').style.display = val === 'Yes' ? 'block' : 'none';
+}
+
+function setBestPrac(val) {
+  APP.formData.bestPrac = val;
+  document.getElementById('tog-bp-yes').className = 'toggle-btn' + (val === 'Yes' ? ' selected-no' : '');
+  document.getElementById('tog-bp-no').className = 'toggle-btn' + (val === 'No' ? ' selected-yes' : '');
+}
+
+// ══════════════════════════════════════════════════════
+// RECORDING
+// ══════════════════════════════════════════════════════
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    APP.recording.chunks = [];
+    APP.recording.blob = null;
+    APP.recording.mediaRecorder = new MediaRecorder(stream);
+    APP.recording.mediaRecorder.ondataavailable = e => {
+      if (e.data.size > 0) APP.recording.chunks.push(e.data);
+    };
+    APP.recording.mediaRecorder.onstop = () => {
+      APP.recording.blob = new Blob(APP.recording.chunks, { type: 'audio/webm' });
+      document.getElementById('rec-ready').style.display = 'block';
+      document.getElementById('rec-status').textContent = 'Recording complete ✓';
+      stream.getTracks().forEach(t => t.stop());
+    };
+    APP.recording.mediaRecorder.start();
+    APP.recording.active = true;
+    APP.recording.seconds = 0;
+
+    APP.recording.timerInterval = setInterval(() => {
+      APP.recording.seconds++;
+      const m = String(Math.floor(APP.recording.seconds / 60)).padStart(2, '0');
+      const s = String(APP.recording.seconds % 60).padStart(2, '0');
+      document.getElementById('rec-timer').textContent = m + ':' + s;
+    }, 1000);
+
+    document.getElementById('btn-start-rec').disabled = true;
+    document.getElementById('btn-stop-rec').disabled = false;
+    document.getElementById('rec-status').innerHTML = '<span class="record-dot"></span>Recording in progress...';
+    toast('Recording started', 'success');
+  } catch(err) {
+    toast('Microphone access denied. Please allow microphone permission.', 'error');
+  }
+}
+
+function stopRecording() {
+  if (APP.recording.mediaRecorder && APP.recording.active) {
+    APP.recording.mediaRecorder.stop();
+    APP.recording.active = false;
+    clearInterval(APP.recording.timerInterval);
+    document.getElementById('btn-start-rec').disabled = false;
+    document.getElementById('btn-stop-rec').disabled = true;
+    toast('Recording stopped', 'success');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// SUBMIT CRO
+// ══════════════════════════════════════════════════════
+async function submitCRO() {
+  const teacher = document.getElementById('f-teacher');
+  const cls = document.getElementById('f-class').value;
+  const section = document.getElementById('f-section').value;
+  const topic = document.getElementById('f-topic').value.trim();
+  const good = document.getElementById('f-good').value.trim();
+
+  if (!teacher.value) { toast('Please select a teacher', 'error'); return; }
+  if (!cls) { toast('Please select a class', 'error'); return; }
+  if (!topic) { toast('Please enter the topic', 'error'); return; }
+  if (!good) { toast('Please enter good practices observed', 'error'); return; }
+  if (Object.keys(APP.formData.ratings).length < 5) { toast('Please rate all 5 observation areas', 'error'); return; }
+  if (!APP.formData.followUp) { toast('Please set Follow-up Required', 'error'); return; }
+
+  const btn = document.getElementById('btn-submit-cro');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  // Get teacher name from list
+  const teacherObj = APP.cache.teachers.find(t => t.teacherEmail === teacher.value);
+  const teacherName = teacherObj ? teacherObj.teacherName : teacher.value;
+
+  // Prepare audio
+  let audioBase64 = '';
+  let audioFileName = '';
+  if (APP.recording.blob) {
+    audioBase64 = await blobToBase64(APP.recording.blob);
+    const d = new Date().toISOString().split('T')[0];
+    const school = APP.user.schoolName.replace(/\s+/g, '_');
+    const obs = APP.user.fullName.replace(/\s+/g, '');
+    const tname = teacherName.replace(/\s+/g, '');
+    const clsClean = cls.replace(/\s+/g, '');
+    audioFileName = `${school}_${obs}_${tname}_${clsClean}${section}_${d}.webm`;
+  }
+
+  const payload = {
+    action: 'submitCRO',
+    schoolName: APP.user.schoolName,
+    observerEmail: APP.user.email,
+    observerName: APP.user.fullName,
+    observerDesignation: APP.user.role,
+    teacherEmail: teacher.value,
+    teacherName,
+    department: APP.user.department,
+    class: cls,
+    section,
+    subject: document.getElementById('f-subject').value,
+    subjectType: document.getElementById('f-subjecttype').value,
+    topic,
+    period: document.getElementById('f-period').value,
+    croType: document.getElementById('f-crotype').value,
+    area1Score: APP.formData.ratings[1] || '',
+    area1Remarks: document.getElementById('rem-1').value,
+    area2Score: APP.formData.ratings[2] || '',
+    area2Remarks: document.getElementById('rem-2').value,
+    area3Score: APP.formData.ratings[3] || '',
+    area3Remarks: document.getElementById('rem-3').value,
+    area4Score: APP.formData.ratings[4] || '',
+    area4Remarks: document.getElementById('rem-4').value,
+    area5Score: APP.formData.ratings[5] || '',
+    area5Remarks: document.getElementById('rem-5').value,
+    goodPractices: good,
+    areasForImprovement: document.getElementById('f-improve').value,
+    supportNeeded: document.getElementById('f-support').value,
+    followUpRequired: APP.formData.followUp,
+    bestPracticeShareable: APP.formData.bestPrac,
+    actionDueDate: document.getElementById('f-duedate') ? document.getElementById('f-duedate').value : '',
+    audioBase64,
+    audioFileName
+  };
+
+  try {
+    const res = await apiPost(payload);
+    if (res.status === 'success') {
+      toast('CRO submitted successfully! ✅', 'success');
+      APP.recording = { mediaRecorder: null, chunks: [], blob: null, timerInterval: null, seconds: 0, active: false };
+      switchTab('my-cros');
+    } else {
+      toast('Submission failed: ' + res.message, 'error');
+      btn.disabled = false;
+      btn.textContent = '✅ Submit CRO Report';
+    }
+  } catch(err) {
+    toast('Connection error. Please try again.', 'error');
+    btn.disabled = false;
+    btn.textContent = '✅ Submit CRO Report';
+  }
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.readAsDataURL(blob);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// MY CROs (OBSERVER VIEW)
+// ══════════════════════════════════════════════════════
+async function renderMyCROs(el) {
+  try {
+    const res = await apiGet({ action: 'getCRORecords', email: APP.user.email, role: APP.user.role });
+    const records = res.records || [];
+
+    if (records.length === 0) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p>No CRO records yet.</p></div>`;
+      return;
+    }
+
+    el.innerHTML = `<div class="section-header">All My CRO Records (${records.length})</div>` +
+      records.reverse().map(r => `
+        <div class="record-item">
+          <div class="record-item-header">
+            <div>
+              <div class="record-item-title">${r.TeacherName || r.TeacherEmail}</div>
+              <div class="record-item-sub">${r.Class} ${r.Section} · ${r.Subject} · ${r.Topic || ''}</div>
+              <div class="record-item-sub">${formatDate(r.SubmittedDate)}</div>
+            </div>
+            <span class="badge badge-${badgeClass(r.Status)}">${r.Status}</span>
+          </div>
+          <div class="score-grid">
+            ${AREA_NAMES.map((n,i) => `
+              <div class="score-item">
+                <div class="score-item-label">${n.substring(0,22)}...</div>
+                <div class="score-item-val">${r['Area'+(i+1)+'Score'] || '—'}/4</div>
+              </div>
+            `).join('')}
+          </div>
+          ${r.RecordingLink ? `<div style="margin-top:8px;"><a href="${r.RecordingLink}" target="_blank" style="color:var(--blue-mid);font-size:12px;">🎙️ Play Recording</a></div>` : ''}
+        </div>
+      `).join('');
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load records.</p></div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// VERIFY (OBSERVER — review action taken)
+// ══════════════════════════════════════════════════════
+async function renderVerify(el) {
+  try {
+    const res = await apiGet({ action: 'getActionItems', email: APP.user.email, role: APP.user.role });
+    const items = (res.items || []).filter(i => i.VerificationStatus === 'Pending' && i.TeacherActionTaken);
+
+    if (items.length === 0) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><p>No pending verifications.</p></div>`;
+      return;
+    }
+
+    el.innerHTML = `<div class="section-header">Pending Action Verification (${items.length})</div>` +
+      items.map((item, idx) => `
+        <div class="record-item">
+          <div class="record-item-title">${item.TeacherName}</div>
+          <div class="record-item-sub">Record: ${item.CRORecordID}</div>
+          <div style="margin:8px 0;font-size:13px;"><strong>Action Point:</strong> ${item.ActionPoint}</div>
+          <div style="margin:8px 0;font-size:13px;background:var(--green-light);padding:8px;border-radius:6px;">
+            <strong>Teacher's Response:</strong><br>${item.TeacherActionTaken}
+          </div>
+          <div class="form-group" style="margin-top:10px;">
+            <textarea class="form-control" id="vrem-${idx}" placeholder="Your verification remarks" rows="2"></textarea>
+          </div>
+          <div class="record-item-actions">
+            <button class="btn-success" onclick="verifyAction('${item.CRORecordID}', 'Approved', ${idx})">✅ Approve</button>
+            <button class="btn-danger" onclick="verifyAction('${item.CRORecordID}', 'Revision Required', ${idx})">↩️ Request Revision</button>
+          </div>
+        </div>
+      `).join('');
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load items.</p></div>`;
+  }
+}
+
+async function verifyAction(recordID, status, idx) {
+  const remarks = document.getElementById('vrem-' + idx).value;
+  try {
+    const res = await apiPost({
+      action: 'verifyAction',
+      recordID,
+      verificationStatus: status,
+      verifiedBy: APP.user.email,
+      verifierRole: APP.user.role,
+      remarks
+    });
+    if (res.status === 'success') {
+      toast(status === 'Approved' ? 'Action approved and closed ✅' : 'Revision requested ↩️', 'success');
+      switchTab('verify');
+    } else {
+      toast('Error: ' + res.message, 'error');
+    }
+  } catch(e) {
+    toast('Connection error', 'error');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// TEACHER — MY REPORTS
+// ══════════════════════════════════════════════════════
+async function renderMyReports(el) {
+  try {
+    const res = await apiGet({ action: 'getCRORecords', email: APP.user.email, role: 'Teacher' });
+    const records = res.records || [];
+
+    if (records.length === 0) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">📄</div><p>No CRO reports yet.</p></div>`;
+      return;
+    }
+
+    el.innerHTML = `<div class="section-header">My CRO Reports (${records.length})</div>` +
+      records.reverse().map(r => `
+        <div class="record-item">
+          <div class="record-item-header">
+            <div>
+              <div class="record-item-title">${r.Class} ${r.Section} · ${r.Subject}</div>
+              <div class="record-item-sub">Observer: ${r.ObserverName} (${r.ObserverDesignation})</div>
+              <div class="record-item-sub">${formatDate(r.SubmittedDate)} · Topic: ${r.Topic}</div>
+            </div>
+            <span class="badge badge-${badgeClass(r.Status)}">${r.Status}</span>
+          </div>
+          <div class="score-grid">
+            ${AREA_NAMES.map((n,i) => `
+              <div class="score-item">
+                <div class="score-item-label">${n.substring(0,22)}...</div>
+                <div class="score-item-val">${r['Area'+(i+1)+'Score'] || '—'}/4</div>
+              </div>
+            `).join('')}
+          </div>
+          <div style="margin-top:8px;font-size:13px;">
+            <strong>Good Practices:</strong> ${r.GoodPractices || '—'}<br>
+            <strong>Areas for Improvement:</strong> ${r.AreasForImprovement || '—'}
+          </div>
+        </div>
+      `).join('');
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load reports.</p></div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// TEACHER — PENDING ACKNOWLEDGEMENT
+// ══════════════════════════════════════════════════════
+async function renderPendingAck(el) {
+  try {
+    const res = await apiGet({ action: 'getCRORecords', email: APP.user.email, role: 'Teacher' });
+    const pending = (res.records || []).filter(r => r.Status === 'Submitted');
+
+    if (pending.length === 0) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">🎉</div><p>No pending acknowledgements.</p></div>`;
+      return;
+    }
+
+    el.innerHTML = `<div class="section-header">Pending Acknowledgement (${pending.length})</div>` +
+      pending.map(r => `
+        <div class="record-item">
+          <div class="record-item-title">${r.Class} ${r.Section} · ${r.Subject}</div>
+          <div class="record-item-sub">Observer: ${r.ObserverName} · ${formatDate(r.SubmittedDate)}</div>
+          <div class="record-item-sub">Topic: ${r.Topic}</div>
+          <div class="score-grid" style="margin-top:10px;">
+            ${AREA_NAMES.map((n,i) => `
+              <div class="score-item">
+                <div class="score-item-label">${n.substring(0,22)}...</div>
+                <div class="score-item-val">${r['Area'+(i+1)+'Score'] || '—'}/4</div>
+              </div>
+            `).join('')}
+          </div>
+          <div style="margin:10px 0;font-size:13px;background:var(--blue-light);padding:10px;border-radius:7px;">
+            <strong>Good Practices:</strong> ${r.GoodPractices || '—'}<br><br>
+            <strong>Areas for Improvement:</strong> ${r.AreasForImprovement || '—'}<br><br>
+            <strong>Follow-up Required:</strong> ${r.FollowUpRequired}
+          </div>
+          <button class="btn-submit" onclick="acknowledgeCRO('${r.CRORecordID}', this)">
+            ✅ Acknowledge this Report
+          </button>
+        </div>
+      `).join('');
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load records.</p></div>`;
+  }
+}
+
+async function acknowledgeCRO(recordID, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Acknowledging...';
+  try {
+    const res = await apiPost({ action: 'acknowledgeCRO', recordID, teacherEmail: APP.user.email });
+    if (res.status === 'success') {
+      toast(res.newStatus === 'Closed' ? 'Report acknowledged — CRO closed ✅' : 'Report acknowledged — please submit Action Taken', 'success');
+      switchTab('pending-ack');
+    } else {
+      toast('Error: ' + res.message, 'error');
+      btn.disabled = false;
+      btn.textContent = '✅ Acknowledge this Report';
+    }
+  } catch(e) {
+    toast('Connection error', 'error');
+    btn.disabled = false;
+    btn.textContent = '✅ Acknowledge this Report';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// TEACHER — ACTION TAKEN
+// ══════════════════════════════════════════════════════
+async function renderActionTaken(el) {
+  try {
+    const res = await apiGet({ action: 'getActionItems', email: APP.user.email, role: 'Teacher' });
+    const pending = (res.items || []).filter(i => i.FinalStatus === 'Open');
+
+    if (pending.length === 0) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><p>No pending action items.</p></div>`;
+      return;
+    }
+
+    el.innerHTML = `<div class="section-header">Pending Action Taken (${pending.length})</div>` +
+      pending.map((item, idx) => `
+        <div class="record-item">
+          <div class="record-item-title">Action Required</div>
+          <div class="record-item-sub">Record: ${item.CRORecordID}</div>
+          <div style="margin:10px 0;font-size:13px;background:var(--orange-light);padding:10px;border-radius:7px;">
+            <strong>Action Point:</strong><br>${item.ActionPoint}
+          </div>
+          ${item.VerificationStatus === 'Revision Required' ? `
+            <div style="background:var(--red-light);padding:8px;border-radius:6px;font-size:12px;margin-bottom:8px;">
+              <strong>Revision Requested:</strong> ${item.VerificationRemarks || ''}
+            </div>` : ''}
+          <div class="form-group">
+            <label class="form-label">Your Action Taken <span class="req">*</span></label>
+            <textarea class="form-control" id="act-${idx}" rows="3"
+              placeholder="Describe what you did to address this">${item.TeacherActionTaken || ''}</textarea>
+          </div>
+          <button class="btn-submit" onclick="submitActionTaken('${item.CRORecordID}', ${idx}, this)">
+            📝 Submit Action Taken
+          </button>
+        </div>
+      `).join('');
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load items.</p></div>`;
+  }
+}
+
+async function submitActionTaken(recordID, idx, btn) {
+  const actionTaken = document.getElementById('act-' + idx).value.trim();
+  if (!actionTaken) { toast('Please describe the action taken', 'error'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  try {
+    const res = await apiPost({ action: 'submitAction', recordID, teacherEmail: APP.user.email, actionTaken });
+    if (res.status === 'success') {
+      toast('Action Taken submitted ✅', 'success');
+      switchTab('action-taken');
+    } else {
+      toast('Error: ' + res.message, 'error');
+      btn.disabled = false;
+      btn.textContent = '📝 Submit Action Taken';
+    }
+  } catch(e) {
+    toast('Connection error', 'error');
+    btn.disabled = false;
+    btn.textContent = '📝 Submit Action Taken';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════
+async function renderDashboard(el) {
+  try {
+    const res = await apiGet({ action: 'getDashboard', email: APP.user.email, role: APP.user.role });
+    const d = res.dashboard;
+
+    const schoolRows = Object.entries(d.schools || {})
+      .map(([s, c]) => `<tr><td style="padding:6px 8px;font-size:13px;">${s}</td><td style="padding:6px 8px;font-size:13px;font-weight:600;text-align:right;">${c}</td></tr>`)
+      .join('');
+
+    el.innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-number">${d.total}</div><div class="stat-label">Total CROs</div></div>
+        <div class="stat-card"><div class="stat-number">${d.ackPending}</div><div class="stat-label">Pending Acknowledgement</div></div>
+        <div class="stat-card"><div class="stat-number">${d.followUp}</div><div class="stat-label">Follow-ups</div></div>
+        <div class="stat-card"><div class="stat-number">${d.closed}</div><div class="stat-label">Closed</div></div>
+        <div class="stat-card"><div class="stat-number">${d.avgScore}</div><div class="stat-label">Avg Score /4</div></div>
+        <div class="stat-card"><div class="stat-number">${d.bestPrac}</div><div class="stat-label">Best Practices</div></div>
+      </div>
+      ${schoolRows ? `
+        <div class="card">
+          <div class="card-title">School-wise CRO Count</div>
+          <table style="width:100%;border-collapse:collapse;">
+            ${schoolRows}
+          </table>
+        </div>` : ''}
+    `;
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load dashboard.</p></div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// MANAGE USERS (School Admin / Super Admin)
+// ══════════════════════════════════════════════════════
+function renderManageUsers(el) {
+  const isSuperAdmin = APP.user.role === 'SuperAdmin';
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-title">Add New User</div>
+      <div class="form-group">
+        <label class="form-label">Full Name <span class="req">*</span></label>
+        <input class="form-control" id="nu-name" placeholder="Full name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email <span class="req">*</span></label>
+        <input class="form-control" id="nu-email" placeholder="email@mgsnagpur.org" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role <span class="req">*</span></label>
+        <select class="form-control" id="nu-role">
+          <option value="">— Select Role —</option>
+          ${isSuperAdmin ? '<option>SuperAdmin</option><option>Management</option>' : ''}
+          <option>Principal</option><option>VicePrincipal</option><option>PPHead</option>
+          <option>SchoolAdmin</option><option>HOD</option>
+          <option>Coordinator</option><option>Supervisor</option><option>Teacher</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">School <span class="req">*</span></label>
+        <select class="form-control" id="nu-school">
+          ${isSuperAdmin
+            ? ['SOS Atrey','SOS Wana','SOS Wardha','SOS CUBS Ram Nagar','SOS CUBS Pratap Nagar']
+                .map(s => `<option>${s}</option>`).join('')
+            : `<option>${APP.user.schoolName}</option>`}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Department</label>
+        <input class="form-control" id="nu-dept" placeholder="e.g. English, Maths (optional)" />
+      </div>
+      <button class="btn-submit" onclick="addUser()">➕ Add User</button>
+    </div>
+  `;
+}
+
+async function addUser() {
+  const name = document.getElementById('nu-name').value.trim();
+  const email = document.getElementById('nu-email').value.trim();
+  const role = document.getElementById('nu-role').value;
+  const school = document.getElementById('nu-school').value;
+
+  if (!name || !email || !role || !school) { toast('Please fill all required fields', 'error'); return; }
+  if (!email.endsWith('@mgsnagpur.org')) { toast('Email must be @mgsnagpur.org', 'error'); return; }
+
+  try {
+    const res = await apiPost({
+      action: 'addUser',
+      fullName: name, email, role, schoolName: school,
+      department: document.getElementById('nu-dept').value,
+      addedBy: APP.user.email
+    });
+    if (res.status === 'success') {
+      toast('User added successfully ✅', 'success');
+      document.getElementById('nu-name').value = '';
+      document.getElementById('nu-email').value = '';
+      document.getElementById('nu-dept').value = '';
+    } else {
+      toast('Error: ' + res.message, 'error');
+    }
+  } catch(e) {
+    toast('Connection error', 'error');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// BULK UPLOAD (Super Admin)
+// ══════════════════════════════════════════════════════
+function renderBulkUpload(el) {
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-title">⬆️ Bulk Upload Users</div>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:14px;">
+        Upload a CSV file to add all teachers and staff at once.
+      </p>
+      <div style="background:var(--blue-light);border-radius:8px;padding:12px;margin-bottom:14px;font-size:12px;">
+        <strong>Required CSV columns (in order):</strong><br><br>
+        FullName, Email, Role, SchoolName, Department, Subject, SubjectType, Class, Section, ObserverEmail
+      </div>
+      <div class="form-group">
+        <label class="form-label">Select CSV File</label>
+        <input type="file" accept=".csv" class="form-control" id="csv-file" onchange="previewCSV()" />
+      </div>
+      <div id="csv-preview" style="font-size:12px;color:var(--gray);margin:8px 0;"></div>
+      <button class="btn-submit" id="btn-upload" onclick="uploadCSV()" disabled>⬆️ Upload All Users</button>
+    </div>
+    <div class="card">
+      <div class="card-title">📥 Download CSV Template</div>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:12px;">Download a ready-to-fill template.</p>
+      <button class="btn-secondary" onclick="downloadTemplate()">📥 Download Template</button>
+    </div>
+  `;
+}
+
+function previewCSV() {
+  const file = document.getElementById('csv-file').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.split('\n').filter(l => l.trim());
+    document.getElementById('csv-preview').textContent =
+      `${lines.length - 1} records found (excluding header)`;
+    document.getElementById('btn-upload').disabled = false;
+  };
+  reader.readAsText(file);
+}
+
+async function uploadCSV() {
+  const file = document.getElementById('csv-file').files[0];
+  if (!file) return;
+
+  const btn = document.getElementById('btn-upload');
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+
+  const reader = new FileReader();
+  reader.onload = async e => {
+    const lines = e.target.result.split('\n').filter(l => l.trim());
+    const headers = lines[0].split(',').map(h => h.trim());
+    const users = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const vals = lines[i].split(',').map(v => v.trim());
+      const user = {};
+      headers.forEach((h, idx) => user[h] = vals[idx] || '');
+      users.push(user);
+    }
+
+    try {
+      const res = await apiPost({ action: 'bulkUpload', users, uploadedBy: APP.user.email });
+      if (res.status === 'success') {
+        toast(`✅ Uploaded ${res.usersAdded} users and ${res.assignsAdded} assignments`, 'success');
+      } else {
+        toast('Upload failed: ' + res.message, 'error');
+      }
+    } catch(err) {
+      toast('Connection error during upload', 'error');
+    }
+
+    btn.disabled = false;
+    btn.textContent = '⬆️ Upload All Users';
+  };
+  reader.readAsText(file);
+}
+
+function downloadTemplate() {
+  const header = 'FullName,Email,Role,SchoolName,Department,Subject,SubjectType,Class,Section,ObserverEmail';
+  const sample = 'Priya Kumar,priya.kumar@mgsnagpur.org,Teacher,SOS Atrey,English,English,Scholastic,Grade 5,A,hod.english@mgsnagpur.org';
+  const blob = new Blob([header + '\n' + sample], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'MGS_CRO_Upload_Template.csv';
+  a.click();
+}
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+function formatDate(d) {
+  if (!d) return '—';
+  try { return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }); }
+  catch(e) { return d; }
+}
+
+function badgeClass(status) {
+  if (!status) return 'submitted';
+  const s = status.toLowerCase();
+  if (s === 'submitted') return 'submitted';
+  if (s === 'acknowledged') return 'acknowledged';
+  if (s.includes('action')) return 'action';
+  if (s === 'closed') return 'closed';
+  if (s.includes('revision')) return 'revision';
+  return 'submitted';
+}
+</script>
+</body>
+</html>
