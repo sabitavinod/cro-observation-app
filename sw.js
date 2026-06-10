@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mgs-cro-v1';
+const CACHE_NAME = 'mgs-cro-v3';
 const ASSETS = [
   '/cro-observation-app/',
   '/cro-observation-app/index.html',
@@ -24,12 +24,16 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Network first for API calls
   if (e.request.url.includes('script.google.com')) {
     e.respondWith(fetch(e.request).catch(() => new Response('{"status":"error","message":"Offline"}')));
     return;
   }
-  // Cache first for app assets
+  // Network first for HTML — always get fresh version
+  if (e.request.url.endsWith('/') || e.request.url.includes('index.html')) {
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    return;
+  }
+  // Cache first for other assets
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );
