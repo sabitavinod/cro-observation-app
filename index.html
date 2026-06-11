@@ -1,0 +1,2800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MGS Classroom Observation</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a3c6e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MGS CRO">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+:root {
+  --blue:#1a3c6e; --blue-mid:#2e6da4; --blue-light:#e8f0f9;
+  --green:#1e7e34; --green-light:#d4edda;
+  --red:#c0392b; --red-light:#fdecea;
+  --orange:#e67e22; --orange-light:#fef3e2;
+  --gray:#6c757d; --gray-light:#f8f9fa;
+  --border:#dee2e6; --white:#ffffff;
+  --shadow:0 2px 12px rgba(0,0,0,0.1); --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;color:#333;min-height:100vh;}
+.screen{display:none;} .screen.active{display:block;}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1a3c6e,#2e6da4);padding:20px;}
+.login-card{background:white;border-radius:16px;padding:40px 32px;width:100%;max-width:400px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.2);text-align:center;}
+.login-logo{font-size:48px;margin-bottom:12px;}
+.login-card h2{color:var(--blue);font-size:22px;margin-bottom:4px;}
+.login-card p{color:var(--gray);font-size:13px;margin-bottom:28px;}
+.login-card input{width:100%;padding:13px 16px;border:2px solid var(--border);border-radius:8px;
+  font-size:15px;margin-bottom:14px;outline:none;transition:border .2s;}
+.login-card input:focus{border-color:var(--blue-mid);}
+.login-error{color:var(--red);font-size:13px;margin-top:10px;min-height:18px;}
+
+/* HEADER */
+.app-header{background:var(--blue);color:white;padding:12px 16px;display:flex;
+  align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow);}
+.app-header h1{font-size:15px;font-weight:600;}
+.user-info{font-size:11px;opacity:.85;text-align:right;}
+.user-info span{display:block;}
+.btn-logout{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+  color:white;padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;margin-top:3px;}
+
+/* LAYOUT */
+.main-content{padding:14px;max-width:720px;margin:0 auto;}
+
+/* NAV */
+.nav-tabs{display:flex;background:white;border-radius:var(--radius);padding:5px;
+  margin-bottom:14px;box-shadow:var(--shadow);overflow-x:auto;gap:4px;}
+.nav-tab{flex:1;min-width:72px;padding:8px 6px;text-align:center;border-radius:7px;
+  font-size:11px;font-weight:500;cursor:pointer;color:var(--gray);border:none;
+  background:none;transition:all .2s;white-space:nowrap;}
+.nav-tab.active{background:var(--blue);color:white;}
+.nav-tab:hover:not(.active){background:var(--blue-light);color:var(--blue);}
+
+/* CARDS */
+.card{background:white;border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);}
+.card-title{font-size:14px;font-weight:600;color:var(--blue);margin-bottom:12px;
+  padding-bottom:8px;border-bottom:2px solid var(--blue-light);}
+
+/* FORMS */
+.form-group{margin-bottom:12px;}
+.form-label{display:block;font-size:12px;font-weight:600;color:#444;margin-bottom:4px;}
+.req{color:var(--red);}
+.form-control{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:14px;background:white;outline:none;transition:border .2s;appearance:none;}
+.form-control:focus{border-color:var(--blue-mid);}
+.form-control:disabled{background:var(--gray-light);color:var(--gray);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+
+/* RATING */
+.rating-group{margin-bottom:14px;padding:12px;background:var(--gray-light);border-radius:8px;}
+.rating-area-name{font-size:13px;color:var(--blue);font-weight:600;margin-bottom:8px;}
+.rating-btns{display:flex;gap:6px;margin-bottom:8px;}
+.rating-btn{flex:1;padding:10px 2px;border:2px solid var(--border);border-radius:7px;
+  background:white;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;}
+.rating-btn:hover{border-color:var(--blue-mid);background:var(--blue-light);}
+.rating-btn.sel-4{background:#1e7e34;border-color:#1e7e34;color:white;}
+.rating-btn.sel-3{background:#2e6da4;border-color:#2e6da4;color:white;}
+.rating-btn.sel-2{background:#e67e22;border-color:#e67e22;color:white;}
+.rating-btn.sel-1{background:#c0392b;border-color:#c0392b;color:white;}
+
+/* RECORDING */
+.record-section{background:linear-gradient(135deg,#1a3c6e,#2e6da4);border-radius:var(--radius);
+  padding:18px;text-align:center;color:white;margin-bottom:12px;}
+.record-title{font-size:15px;font-weight:600;margin-bottom:4px;}
+.record-sub{font-size:12px;opacity:.8;margin-bottom:14px;}
+.record-timer{font-size:36px;font-weight:700;font-family:monospace;margin:8px 0;letter-spacing:2px;}
+.record-status{font-size:12px;margin-bottom:12px;opacity:.85;min-height:18px;}
+.btn-rec{padding:12px 24px;border-radius:30px;border:none;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .2s;margin:3px;}
+.btn-rec-start{background:#e74c3c;color:white;}
+.btn-rec-start:hover{background:#c0392b;}
+.btn-rec-stop{background:#f39c12;color:white;}
+.btn-rec-stop:hover{background:#d68910;}
+.btn-rec:disabled{background:#aaa;cursor:not-allowed;}
+.rec-dot{display:inline-block;width:9px;height:9px;border-radius:50%;
+  background:#e74c3c;margin-right:5px;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.rec-ready{background:rgba(255,255,255,.15);border-radius:7px;padding:8px;font-size:12px;margin-top:10px;}
+
+/* TOGGLE */
+.toggle-group{display:flex;gap:8px;}
+.toggle-btn{flex:1;padding:10px;border:2px solid var(--border);border-radius:8px;
+  background:white;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;}
+.toggle-btn.sel-yes{background:var(--red);border-color:var(--red);color:white;}
+.toggle-btn.sel-no{background:var(--green);border-color:var(--green);color:white;}
+.toggle-btn.sel-active{background:var(--blue);border-color:var(--blue);color:white;}
+
+/* BUTTONS */
+.btn-primary{width:100%;padding:13px;background:var(--blue);color:white;border:none;
+  border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;}
+.btn-primary:hover{background:var(--blue-mid);}
+.btn-primary:disabled{background:#aaa;cursor:not-allowed;}
+.btn-submit{width:100%;padding:13px;background:var(--green);color:white;border:none;
+  border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;}
+.btn-submit:hover{background:#155724;}
+.btn-submit:disabled{background:#aaa;cursor:not-allowed;}
+.btn-secondary{width:100%;padding:11px;background:white;color:var(--blue);
+  border:2px solid var(--blue);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px;}
+.btn-secondary:hover{background:var(--blue-light);}
+.btn-danger{padding:9px 16px;background:var(--red);color:white;border:none;border-radius:7px;font-size:12px;cursor:pointer;}
+.btn-success{padding:9px 16px;background:var(--green);color:white;border:none;border-radius:7px;font-size:12px;cursor:pointer;}
+.btn-sm{padding:7px 14px;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-submitted{background:#cce5ff;color:#004085;}
+.badge-acknowledged{background:var(--green-light);color:#155724;}
+.badge-action{background:var(--orange-light);color:#7d4e00;}
+.badge-closed{background:#e2e3e5;color:#383d41;}
+.badge-revision{background:var(--red-light);color:#721c24;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.stat-card{background:white;border-radius:var(--radius);padding:12px;text-align:center;box-shadow:var(--shadow);}
+.stat-number{font-size:26px;font-weight:700;color:var(--blue);}
+.stat-label{font-size:10px;color:var(--gray);margin-top:2px;}
+
+/* RECORDS */
+.record-item{background:white;border-radius:var(--radius);padding:14px;margin-bottom:10px;
+  box-shadow:var(--shadow);border-left:4px solid var(--blue-mid);}
+.record-item-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.record-item-title{font-size:14px;font-weight:600;color:var(--blue);}
+.record-item-sub{font-size:12px;color:var(--gray);margin-top:2px;}
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0;}
+.score-item{background:var(--blue-light);border-radius:6px;padding:7px 9px;}
+.score-label{font-size:10px;color:var(--blue);font-weight:600;}
+.score-val{font-size:16px;font-weight:700;color:var(--blue);}
+
+/* ASSIGNMENT BUILDER */
+.assignment-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;
+  align-items:center;margin-bottom:8px;background:var(--gray-light);padding:8px;border-radius:7px;}
+.assignment-row select{padding:8px;border:1.5px solid var(--border);border-radius:6px;
+  font-size:13px;background:white;}
+.btn-remove-row{background:var(--red);color:white;border:none;border-radius:6px;
+  padding:8px 10px;cursor:pointer;font-size:14px;}
+.btn-add-row{background:var(--blue-light);color:var(--blue);border:2px dashed var(--blue-mid);
+  border-radius:7px;padding:10px;width:100%;cursor:pointer;font-size:13px;font-weight:600;margin-top:6px;}
+
+/* LOADING */
+.loading{text-align:center;padding:40px 20px;color:var(--gray);}
+.spinner{width:34px;height:34px;border:3px solid var(--border);border-top:3px solid var(--blue);
+  border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:#333;color:white;padding:11px 18px;border-radius:8px;font-size:13px;
+  z-index:9999;display:none;max-width:320px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+#toast.success{background:var(--green);}
+#toast.error{background:var(--red);}
+
+.empty{text-align:center;padding:40px 20px;color:var(--gray);}
+.empty-icon{font-size:38px;margin-bottom:8px;}
+.section-hdr{font-size:12px;font-weight:600;color:var(--gray);text-transform:uppercase;
+  letter-spacing:.5px;margin:14px 0 8px;}
+.info-box{background:var(--blue-light);border-radius:8px;padding:10px 12px;
+  font-size:12px;color:var(--blue);margin-bottom:12px;}
+.info-box.orange{background:var(--orange-light);color:#7d4e00;}
+.info-box.green{background:var(--green-light);color:#155724;}
+
+@media(max-width:400px){
+  .form-row{grid-template-columns:1fr;}
+  .form-row-3{grid-template-columns:1fr 1fr;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .assignment-row{grid-template-columns:1fr 1fr auto;grid-template-rows:auto auto;}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- LOGIN -->
+<div id="screen-login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo"><img src="data:image/png;base64,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" style="width:96px;height:96px;border-radius:50%;display:block;margin:0 auto 4px;" alt="Meghe Group"/></div>
+      <h2>MGS Classroom Observation</h2>
+      <p style="color:#2e6da4;font-style:italic;font-size:13px;">Excellence in Every Classroom</p>
+      <input type="email" id="login-email" placeholder="Enter your school email" autocomplete="email"/>
+      <button class="btn-primary" onclick="doLogin()">Sign In</button>
+      <div class="login-error" id="login-error"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="screen-loading" class="screen">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;">
+    <div class="loading"><div class="spinner"></div><div>Loading...</div></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="screen-app" class="screen">
+  <div class="app-header">
+    <h1>MGS Classroom Observation</h1>
+    <div class="user-info">
+      <span id="header-name">—</span>
+      <span id="header-role">—</span>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="nav-tabs" id="nav-tabs"></div>
+    <div id="tab-content"></div>
+  </div>
+</div>
+
+<!-- RC SCHOOL SELECT -->
+<div id="screen-rc-school" class="screen">
+  <div class="app-header">
+    <h1>MGS Classroom Observation</h1>
+    <div class="user-info">
+      <span id="rc-name">—</span>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="card">
+      <div class="card-title">🏫 Select School for Today's Visit</div>
+      <div class="info-box" style="margin-bottom:14px;">
+        You are logged in as Resource Centre. Please select the school you are visiting today.
+        This selection applies to this session only.
+      </div>
+      <div class="form-group">
+        <label class="form-label">School <span class="req">*</span></label>
+        <select class="form-control" id="rc-school-select">
+          <option value="">— Select School —</option>
+        </select>
+      </div>
+      <button class="btn-submit" onclick="confirmRCSchool()">✅ Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEACHER SETUP -->
+<div id="screen-setup" class="screen">
+  <div class="app-header">
+    <h1>MGS Classroom Observation</h1>
+    <div class="user-info">
+      <span id="setup-name">—</span>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="card">
+      <div class="card-title">👋 Welcome — Set Up Your Classes</div>
+      <div class="info-box">Add all the classes and sections you teach. You can update these later from your profile.</div>
+      <div id="assignment-rows"></div>
+      <button class="btn-add-row" onclick="addAssignmentRow()">＋ Add Another Class</button>
+      <button class="btn-submit" style="margin-top:14px;" onclick="saveTeacherSetup()">✅ Save and Continue</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxdLZUOq1MhnDa7CgMOkUTn28iRGk1zt6NOTN2z0hmUfy0vobpwVv-RvEaE3VP-5mglA/exec";
+
+const AREA_NAMES = [
+  "Implementation of Pedagogy",
+  "Student Involvement",
+  "Language and Subject-Specific Terminology",
+  "Learning Environment",
+  "Utility of Resources"
+];
+
+const SCHOOL_CLASSES = {
+  "SOS Atrey":             ["Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade 10"],
+  "SOS Wana":              ["Nursery","KG1","KG2","Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade 10"],
+  "SOS Wardha":            ["Nursery","KG1","KG2","Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade 10"],
+  "SOS CUBS Ram Nagar":    ["Nursery","KG1","KG2"],
+  "SOS CUBS Pratap Nagar": ["Nursery","KG1","KG2"]
+};
+
+const SECTIONS = ["A","B","C","D","E","F","G"];
+
+const OBSERVER_ROLES = ["Principal","VicePrincipal","PPHead","CoordinatorPrimary","CoordinatorHighSchool","Supervisor","SuperAdmin","SchoolAdmin","RC"];
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let APP = {
+  user: null,
+  formData: { ratings:{}, followUp:'No', bestPrac:'No' },
+  rec: { mediaRecorder:null, chunks:[], blob:null, timer:null, seconds:0, active:false },
+  cache: { teachers:[], classAccess:[], subjects:[] },
+  setupRows: 0,
+  tabCache: {} // in-memory tab data cache
+};
+
+// ── AUTO-RESTORE SESSION ────────────────────────────────────────
+(function restoreSession(){
+  try{
+    const saved = sessionStorage.getItem('mgs_cro_user');
+    if(saved){
+      const user = JSON.parse(saved);
+      if(user && user.email && user.role && user.isActive === 'TRUE'){
+        APP.user = user;
+        // Restore RC school if saved
+        const rcSchool = sessionStorage.getItem('mgs_cro_rc_school');
+        if(user.role === 'RC' && rcSchool){
+          APP.user.schoolName = rcSchool;
+          APP.user.rcSelectedSchool = rcSchool;
+        }
+        // Delay to allow DOM to be ready
+        window.addEventListener('DOMContentLoaded', function(){
+          initApp();
+        });
+        // Also try immediately in case DOM is already ready
+        if(document.readyState !== 'loading'){
+          initApp();
+        }
+      }
+    }
+  } catch(e){
+    sessionStorage.removeItem('mgs_cro_user');
+  }
+})();
+
+// ══════════════════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════════════════
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen-'+id).classList.add('active'); }
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=type;t.style.display='block';setTimeout(()=>t.style.display='none',3200);}
+async function apiGet(p){const url=SCRIPT_URL+'?'+new URLSearchParams(p);const r=await fetch(url);return r.json();}
+async function apiPost(b){const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(b)});return r.json();}
+
+
+async function checkTeacherSetup(){
+  try{
+    const res = await apiGet({action:'getMyAssignments', teacherEmail:APP.user.email});
+    if(res.hasAssignments){
+      initApp();
+    } else {
+      showTeacherSetup();
+    }
+  } catch(e){ initApp(); }
+}
+
+function doLogout(){
+  sessionStorage.removeItem('mgs_cro_user');
+  APP={user:null,formData:{ratings:{},followUp:'No',bestPrac:'No'},rec:{mediaRecorder:null,chunks:[],blob:null,timer:null,seconds:0,active:false},cache:{teachers:[],classAccess:[],subjects:[]},setupRows:0,tabCache:{}};
+  document.getElementById('login-email').value='';
+  document.getElementById('login-error').textContent='';
+  showScreen('login');
+}
+document.getElementById('login-email').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// ══════════════════════════════════════════════════════
+// TEACHER FIRST-LOGIN SETUP
+// ══════════════════════════════════════════════════════
+function showTeacherSetup(){
+  document.getElementById('setup-name').textContent = APP.user.fullName;
+  APP.setupRows = 0;
+  document.getElementById('assignment-rows').innerHTML = '';
+  addAssignmentRow();
+  showScreen('setup');
+}
+
+function addAssignmentRow(){
+  APP.setupRows++;
+  const idx = APP.setupRows;
+  const school = APP.user.schoolName;
+  const classes = SCHOOL_CLASSES[school] || [];
+  const classOpts = classes.map(c=>`<option value="${c}">${c}</option>`).join('');
+  const secOpts = SECTIONS.map(s=>`<option value="${s}">${s}</option>`).join('');
+
+  const div = document.createElement('div');
+  div.className = 'assignment-row';
+  div.id = 'arow-'+idx;
+  div.innerHTML = `
+    <select class="form-control" id="asubj-${idx}"><option value="">Subject</option><option value="${APP.user.department}">${APP.user.department}</option></select>
+    <select class="form-control" id="acls-${idx}"><option value="">Class</option>${classOpts}</select>
+    <select class="form-control" id="asec-${idx}"><option value="">Section</option>${secOpts}</select>
+    <button class="btn-remove-row" onclick="removeAssignmentRow(${idx})">✕</button>
+  `;
+  document.getElementById('assignment-rows').appendChild(div);
+}
+
+function removeAssignmentRow(idx){
+  const el = document.getElementById('arow-'+idx);
+  if(el) el.remove();
+}
+
+async function saveTeacherSetup(){
+  const rows = document.querySelectorAll('[id^="arow-"]');
+  const assignments = [];
+  let valid = true;
+
+  rows.forEach(row=>{
+    const idx = row.id.replace('arow-','');
+    const subj = document.getElementById('asubj-'+idx)?.value;
+    const cls  = document.getElementById('acls-'+idx)?.value;
+    const sec  = document.getElementById('asec-'+idx)?.value;
+    if(subj && cls && sec){
+      assignments.push({subject:subj, class:cls, section:sec});
+    } else if(subj||cls||sec){
+      valid = false;
+    }
+  });
+
+  if(!valid){ toast('Please complete all rows or remove incomplete ones','error'); return; }
+  if(assignments.length===0){ toast('Please add at least one class','error'); return; }
+
+  const btn = document.querySelector('#screen-setup .btn-submit');
+  btn.disabled=true; btn.textContent='Saving...';
+
+  const setupTimeout = setTimeout(()=>{
+    btn.disabled=false; btn.textContent='✅ Save and Continue';
+    toast('Request timed out — please try again','error');
+  }, 30000);
+
+  try{
+    const res = await apiPost({
+      action:'saveAssignments',
+      teacherEmail:APP.user.email,
+      teacherName:APP.user.fullName,
+      schoolName:APP.user.schoolName,
+      department:APP.user.department,
+      assignments
+    });
+    clearTimeout(setupTimeout);
+    if(res && res.status==='success'){
+      toast('Classes saved successfully ✅','success');
+      initApp();
+    } else {
+      btn.disabled=false; btn.textContent='✅ Save and Continue';
+      toast('Error: '+(res?res.message:'Unknown error'),'error');
+    }
+  } catch(e){
+    clearTimeout(setupTimeout);
+    toast('Connection error. Please try again.','error');
+    btn.disabled=false; btn.textContent='✅ Save and Continue';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// INIT APP
+// ══════════════════════════════════════════════════════
+function initApp(){
+  const u = APP.user;
+  document.getElementById('header-name').textContent = u.fullName;
+  document.getElementById('header-role').textContent = u.role+' — '+u.schoolName;
+  const tabs = getTabsForRole(u.role);
+  renderNavTabs(tabs);
+  showScreen('app');
+  switchTab(tabs[0].id);
+}
+
+function getTabsForRole(role){
+  const tabs=[];
+  // Pure observer roles only
+  const pureObservers=['Principal','VicePrincipal','PPHead','CoordinatorPrimary','CoordinatorHighSchool','Supervisor'];
+  if(pureObservers.includes(role)){
+    tabs.push({id:'new-cro',label:'📋 New CRO'});
+    tabs.push({id:'my-cros',label:'📁 My CROs'});
+    tabs.push({id:'verify',label:'✅ Verify'});
+    tabs.push({id:'teacher-tracker',label:'📊 Observation Tracker'});
+    if(role==='Principal') tabs.push({id:'principal-reports',label:'📊 Reports'});
+    tabs.push({id:'dashboard',label:'📊 Dashboard'});
+  }
+  if(role==='RC'){
+    tabs.push({id:'new-cro',label:'📋 New CRO'});
+    tabs.push({id:'my-cros',label:'📁 My CROs'});
+    tabs.push({id:'verify',label:'✅ Verify'});
+    tabs.push({id:'teacher-tracker',label:'📊 Observation Tracker'});
+    tabs.push({id:'dashboard',label:'📊 Dashboard'});
+  }
+  if(role==='Teacher'){
+    tabs.push({id:'my-reports',label:'📄 My Reports'});
+    tabs.push({id:'my-history',label:'📊 Detailed Report'});
+    tabs.push({id:'pending-ack',label:'🔔 Acknowledge'});
+    tabs.push({id:'action-taken',label:'📝 Action Taken'});
+    tabs.push({id:'my-profile',label:'👤 My Classes'});
+  }
+  if(role==='SchoolAdmin'){
+    tabs.push({id:'manage-users',label:'👥 Users'});
+    tabs.push({id:'bulk-upload',label:'⬆️ Upload'});
+  }
+  if(role==='SuperAdmin'){
+    tabs.push({id:'manage-users',label:'👥 Users'});
+    tabs.push({id:'bulk-upload',label:'⬆️ Upload'});
+    tabs.push({id:'teacher-tracker',label:'📊 Observation Tracker'});
+    tabs.push({id:'dashboard',label:'📊 Dashboard'});
+  }
+  if(role==='Management'){
+    tabs.push({id:'teacher-tracker',label:'📊 Observation Tracker'});
+    tabs.push({id:'dashboard',label:'📊 Dashboard'});
+  }
+  return tabs;
+}
+
+function renderNavTabs(tabs){
+  document.getElementById('nav-tabs').innerHTML = tabs.map(t=>
+    `<button class="nav-tab" data-id="${t.id}" onclick="switchTab('${t.id}')">${t.label}</button>`
+  ).join('');
+}
+
+function switchTab(id){
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.id===id));
+  renderTab(id);
+}
+
+async function renderTab(id){
+  const el = document.getElementById('tab-content');
+  const NOCACHE = new Set(['new-cro','pending-ack','action-taken','verify']);
+
+  // Show cached instantly for cacheable tabs
+  if(!NOCACHE.has(id) && APP.tabCache[id]){
+    el.innerHTML = APP.tabCache[id];
+    if(id==='teacher-tracker'){
+      var inp = document.getElementById('tracker-search');
+      if(inp) inp.oninput = filterTrackerTable;
+    }
+  } else {
+    el.innerHTML=`<div class="loading"><div class="spinner"></div><div>Loading...</div></div>`;
+  }
+
+  if(id==='new-cro')              await renderNewCRO(el);
+  else if(id==='my-cros')         { await renderMyCROs(el); APP.tabCache[id]=el.innerHTML; }
+  else if(id==='verify')          await renderVerify(el);
+  else if(id==='dashboard')       { await renderDashboard(el); }
+  else if(id==='my-reports')      { await renderMyReports(el); APP.tabCache[id]=el.innerHTML; }
+  else if(id==='pending-ack')     await renderPendingAck(el);
+  else if(id==='action-taken')    await renderActionTaken(el);
+  else if(id==='my-history')      { await renderMyHistory(el); APP.tabCache[id]=el.innerHTML; }
+  else if(id==='my-profile')      renderMyProfile(el);
+  else if(id==='teacher-tracker') { await renderTeacherTracker(el); APP.tabCache[id]=el.innerHTML; }
+  else if(id==='principal-reports'){ await renderPrincipalReports(el); APP.tabCache[id]=el.innerHTML; }
+  else if(id==='manage-users')    renderManageUsers(el);
+  else if(id==='bulk-upload')     renderBulkUpload(el);
+  else el.innerHTML=`<div class="empty"><div class="empty-icon">🚧</div>Coming soon</div>`;
+}
+
+
+// ══════════════════════════════════════════════════════
+// NEW CRO FORM
+// ══════════════════════════════════════════════════════
+async function renderNewCRO(el){
+  const activeSchool = APP.user.rcSelectedSchool || APP.user.schoolName;
+  APP.cache.teachers = [];
+  APP.cache.classAccess = [];
+
+  // Render form shell IMMEDIATELY - no waiting for API
+  el.innerHTML = buildCROFormHTML();
+  APP.formData = {ratings:{}, followUp:'No', bestPrac:'No'};
+
+  // Set Follow-up and Best Practice defaults
+  setFollowup('No');
+  setBP('No');
+
+  // Load teachers asynchronously in background
+  loadTeachersAsync(activeSchool);
+}
+
+function buildCROFormHTML(){
+  var secOpts = SECTIONS.map(function(s){
+    return '<option value="'+s+'">'+s+'</option>';
+  }).join('');
+
+  var rubricHTML = '';
+  for(var i=0;i<AREA_NAMES.length;i++){
+    var areaName = AREA_NAMES[i];
+    var areaNum  = i+1;
+    var btnHTML  = '';
+    var ratings  = [4,3,2,1];
+    for(var j=0;j<ratings.length;j++){
+      var r = ratings[j];
+      btnHTML += '<button class="rating-btn" id="r'+areaNum+'-'+r+'" onclick="setRating('+areaNum+','+r+')">'+r+'</button>';
+    }
+    rubricHTML += '<div class="rating-group">'
+      + '<div class="rating-area-name">'+areaNum+'. '+areaName+'</div>'
+      + '<div class="rating-btns">'+btnHTML+'</div>'
+      + '<input class="form-control" id="rem-'+areaNum+'" placeholder="Remarks (optional)" style="font-size:13px;background:white;"/>'
+      + '</div>';
+  }
+
+  return ''
+    + '<div class="record-section">'
+    + '<div class="record-title">🎙️ Class Recording</div>'
+    + '<div class="record-sub">Optional — start before class begins, stop when done</div>'
+    + '<div class="record-timer" id="rec-timer">00:00</div>'
+    + '<div class="record-status" id="rec-status">Ready to record</div>'
+    + '<div>'
+    + '<button class="btn-rec btn-rec-start" id="btn-start" onclick="startRec()">⏺ Start</button>'
+    + '<button class="btn-rec btn-rec-stop" id="btn-stop" onclick="stopRec()" disabled>⏹ Stop</button>'
+    + '</div>'
+    + '<div class="rec-ready" id="rec-ready" style="display:none">✅ Recording saved — will upload with form</div>'
+    + '</div>'
+
+    + '<div class="card" style="position:relative;">'
+    + '<div class="card-title">Teacher and Class Details</div>'
+    + '<div class="form-group" id="teacher-search-group" style="position:relative;">'
+    + '<label class="form-label">Teacher <span class="req">*</span></label>'
+    + '<div id="teacher-loading" style="background:var(--gray-light);border-radius:8px;padding:12px;text-align:center;color:var(--gray);font-size:13px;">'
+    + '<div class="spinner" style="width:20px;height:20px;margin:0 auto 6px;"></div>'
+    + 'Loading teacher list...'
+    + '</div>'
+    + '<input type="hidden" id="f-teacher" value=""/>'
+    + '<div id="teacher-search-wrapper" style="display:none;"></div>'
+    + '</div>'
+    + '<div class="form-row">'
+    + '<div class="form-group"><label class="form-label">Class <span class="req">*</span></label>'
+    + '<select class="form-control" id="f-class" onchange="onClassChange()">'
+    + '<option value="">— Select Teacher First —</option>'
+    + '</select></div>'
+    + '<div class="form-group"><label class="form-label">Section <span class="req">*</span></label>'
+    + '<select class="form-control" id="f-section">'
+    + '<option value="">— Select —</option>'+secOpts
+    + '</select></div>'
+    + '</div>'
+    + '<div class="form-row">'
+    + '<div class="form-group"><label class="form-label">Subject <span class="req">*</span></label>'
+    + '<select class="form-control" id="f-subject"><option value="">— Select Teacher First —</option></select></div>'
+    + '<div class="form-group"><label class="form-label">CRO Type</label>'
+    + '<select class="form-control" id="f-crotype">'
+    + '<option value="Regular">Regular</option>'
+    + '<option value="Follow-up">Follow-up</option>'
+    + '<option value="Special Programme">Special Programme</option>'
+    + '</select></div>'
+    + '</div>'
+    + '<div class="form-group"><label class="form-label">Topic / Subtopic <span class="req">*</span></label>'
+    + '<input class="form-control" id="f-topic" placeholder="Enter topic taught today"/></div>'
+    + '<div class="form-row">'
+    + '<div class="form-group"><label class="form-label">Period / Time</label>'
+    + '<input class="form-control" id="f-period" placeholder="e.g. Period 3 / 10:00 AM"/></div>'
+    + '<div class="form-group"><label class="form-label">Subject Type</label>'
+    + '<select class="form-control" id="f-subjecttype">'
+    + '<option value="Scholastic">Scholastic</option>'
+    + '<option value="Co-Scholastic">Co-Scholastic</option>'
+    + '<option value="Special Programme">Special Programme</option>'
+    + '</select></div>'
+    + '</div>'
+    + '</div>'
+
+    + '<div class="card">'
+    + '<div class="card-title">Observation Ratings</div>'
+    + '<div class="info-box">4 = Exemplary &nbsp;|&nbsp; 3 = Proficient &nbsp;|&nbsp; 2 = Progressing &nbsp;|&nbsp; 1 = Beginner</div>'
+    + rubricHTML
+    + '</div>'
+
+    + '<div class="card">'
+    + '<div class="card-title">Overall Observation Summary</div>'
+    + '<div class="form-group"><label class="form-label">Good Practices Identified <span class="req">*</span></label>'
+    + '<textarea class="form-control" id="f-good" rows="2" placeholder="What went well in this class?"></textarea></div>'
+    + '<div class="form-group"><label class="form-label">Areas for Improvement</label>'
+    + '<textarea class="form-control" id="f-improve" rows="2" placeholder="What can be improved?"></textarea></div>'
+    + '<div class="form-group"><label class="form-label">Support Needed</label>'
+    + '<textarea class="form-control" id="f-support" rows="2" placeholder="What support does the teacher need?"></textarea></div>'
+    + '<div class="form-group"><label class="form-label">Follow-up Required? <span class="req">*</span></label>'
+    + '<div class="toggle-group">'
+    + '<button class="toggle-btn" id="tog-yes" onclick="setFollowup(this.dataset.val)" data-val="Yes">Yes — Action Required</button>'
+    + '<button class="toggle-btn sel-no" id="tog-no" onclick="setFollowup(this.dataset.val)" data-val="No">No — Close after acknowledgement</button>'
+    + '</div></div>'
+    + '<div id="due-date-grp" style="display:none" class="form-group">'
+    + '<label class="form-label">Action Due Date</label>'
+    + '<input class="form-control" type="date" id="f-duedate"/></div>'
+    + '<div class="form-group"><label class="form-label">Best Practice — Shareable?</label>'
+    + '<div class="toggle-group">'
+    + '<button class="toggle-btn" id="tog-bp-yes" onclick="setBP(this.dataset.val)" data-val="Yes">Yes</button>'
+    + '<button class="toggle-btn sel-no" id="tog-bp-no" onclick="setBP(this.dataset.val)" data-val="No">No</button>'
+    + '</div></div>'
+    + '</div>'
+    + '<button class="btn-submit" id="btn-submit-cro" onclick="submitCRO()">✅ Submit CRO Report</button>'
+    + '<div style="height:30px;"></div>';
+}
+
+
+async function loadTeachersAsync(activeSchool){
+  try{
+    const [teacherRes, classRes] = await Promise.all([
+      apiGet({action:'getTeachers', observerEmail:APP.user.email, schoolName:activeSchool}),
+      apiGet({action:'getClassAccess', role:APP.user.role==='RC'?'Principal':APP.user.role, schoolName:activeSchool})
+    ]);
+    APP.cache.teachers    = teacherRes.teachers    || [];
+    APP.cache.classAccess = classRes.classes       || [];
+
+    var loadingEl = document.getElementById('teacher-loading');
+    var wrapperEl = document.getElementById('teacher-search-wrapper');
+    if(!loadingEl || !wrapperEl) return; // user navigated away
+
+    loadingEl.style.display = 'none';
+    wrapperEl.style.display = 'block';
+    wrapperEl.innerHTML = renderSearchableTeacher(APP.cache.teachers);
+
+    if(!APP.cache.teachers.length){
+      wrapperEl.innerHTML = '<div class="info-box orange">No teachers found for this school. Please upload teacher data first.</div>';
+    }
+  } catch(e){
+    var loadingEl = document.getElementById('teacher-loading');
+    if(loadingEl) loadingEl.innerHTML = '<div style="color:var(--red);">Error loading teachers. Please try again.</div>';
+    console.error('Teacher load error:', e);
+  }
+}
+
+
+async function onTeacherChange(){
+  const email = document.getElementById('f-teacher').value;
+  const classEl   = document.getElementById('f-class');
+  const sectionEl = document.getElementById('f-section');
+  const subjEl    = document.getElementById('f-subject');
+  const submitBtn = document.getElementById('btn-submit-cro');
+
+  // Reset all dropdowns
+  classEl.innerHTML   = '<option value="">Loading...</option>';
+  sectionEl.innerHTML = '<option value="">— Select —</option>';
+  subjEl.innerHTML    = '<option value="">— Select Subject —</option>';
+
+  if(!email){
+    classEl.innerHTML = '<option value="">— Select —</option>';
+    return;
+  }
+
+  try{
+    const res = await apiGet({action:'getMyAssignments', teacherEmail:email});
+    const assignments = res.assignments || [];
+
+    if(!assignments.length || !res.hasAssignments){
+      // Teacher has not set up classes yet
+      classEl.innerHTML   = '<option value="">Not set up</option>';
+      sectionEl.innerHTML = '<option value="">Not set up</option>';
+      subjEl.innerHTML    = '<option value="">Not set up</option>';
+      // Show warning
+      let warn = document.getElementById('teacher-setup-warn');
+      if(!warn){
+        warn = document.createElement('div');
+        warn.id = 'teacher-setup-warn';
+        warn.className = 'info-box orange';
+        warn.style.marginTop = '8px';
+        classEl.closest('.card').insertBefore(warn, classEl.closest('.form-group').nextSibling);
+      }
+      warn.style.display = 'block';
+      warn.textContent = '⚠️ This teacher has not set up their classes yet. Please ask the teacher to log in and set up their classes before conducting a CRO.';
+      if(submitBtn) submitBtn.disabled = true;
+      APP.cache.assignments = [];
+      return;
+    }
+
+    // Remove warning if it exists
+    const warn = document.getElementById('teacher-setup-warn');
+    if(warn) warn.style.display = 'none';
+    if(submitBtn) submitBtn.disabled = false;
+
+    APP.cache.assignments = assignments;
+
+    // Unique classes from assignments
+    const classes = [...new Set(assignments.map(a=>a.class))].sort();
+    classEl.innerHTML = '<option value="">— Select Class —</option>' +
+      classes.map(c=>`<option value="${c}">${c}</option>`).join('');
+
+    // All unique subjects across all assignments
+    const subjects = [...new Set(assignments.map(a=>a.subject).filter(Boolean))].sort();
+    subjEl.innerHTML = '<option value="">— Select Subject —</option>' +
+      subjects.map(s=>`<option value="${s}">${s}</option>`).join('');
+
+    // Reset section
+    sectionEl.innerHTML = '<option value="">— Select Class First —</option>';
+
+  } catch(e){
+    classEl.innerHTML = '<option value="">— Error loading —</option>';
+    console.error(e);
+  }
+}
+
+function onClassChange(){
+  const cls       = document.getElementById('f-class').value;
+  const sectionEl = document.getElementById('f-section');
+  if(!cls || !APP.cache.assignments.length){
+    sectionEl.innerHTML = '<option value="">— Select —</option>';
+    return;
+  }
+  // Filter sections for selected class
+  const sections = [...new Set(
+    APP.cache.assignments.filter(a=>a.class===cls).map(a=>a.section).filter(Boolean)
+  )].sort();
+  sectionEl.innerHTML = '<option value="">— Select Section —</option>' +
+    sections.map(s=>`<option value="${s}">${s}</option>`).join('');
+}
+
+function setRating(area,val){
+  APP.formData.ratings[area]=val;
+  for(let r=1;r<=4;r++){
+    const b=document.getElementById(`r${area}-${r}`);
+    b.className='rating-btn'+(r===val?` sel-${r}`:'');
+  }
+}
+
+function setFollowup(val){
+  APP.formData.followUp=val;
+  document.getElementById('tog-yes').className='toggle-btn'+(val==='Yes'?' sel-yes':'');
+  document.getElementById('tog-no').className='toggle-btn'+(val==='No'?' sel-no':'');
+  document.getElementById('due-date-grp').style.display=val==='Yes'?'block':'none';
+}
+
+function setBP(val){
+  APP.formData.bestPrac=val;
+  document.getElementById('tog-bp-yes').className='toggle-btn'+(val==='Yes'?' sel-no':'');
+  document.getElementById('tog-bp-no').className='toggle-btn'+(val==='No'?' sel-no':'');
+}
+
+// ── RECORDING ──────────────────────────────────────────
+async function startRec(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    APP.rec.chunks=[]; APP.rec.blob=null;
+    APP.rec.mediaRecorder = new MediaRecorder(stream);
+    APP.rec.mediaRecorder.ondataavailable = e=>{ if(e.data.size>0) APP.rec.chunks.push(e.data); };
+    APP.rec.mediaRecorder.onstop = ()=>{
+      APP.rec.blob = new Blob(APP.rec.chunks,{type:'audio/webm'});
+      document.getElementById('rec-ready').style.display='block';
+      document.getElementById('rec-status').textContent='Recording complete ✓';
+      stream.getTracks().forEach(t=>t.stop());
+    };
+    APP.rec.mediaRecorder.start();
+    APP.rec.active=true; APP.rec.seconds=0;
+    APP.rec.timer = setInterval(()=>{
+      APP.rec.seconds++;
+      const m=String(Math.floor(APP.rec.seconds/60)).padStart(2,'0');
+      const s=String(APP.rec.seconds%60).padStart(2,'0');
+      document.getElementById('rec-timer').textContent=m+':'+s;
+    },1000);
+    document.getElementById('btn-start').disabled=true;
+    document.getElementById('btn-stop').disabled=false;
+    document.getElementById('rec-status').innerHTML='<span class="rec-dot"></span>Recording in progress...';
+    toast('Recording started','success');
+  } catch(e){ toast('Microphone access denied. Please allow microphone permission.','error'); }
+}
+
+function stopRec(){
+  return new Promise(resolve => {
+    if(!APP.rec.mediaRecorder || !APP.rec.active){
+      resolve(APP.rec.blob);
+      return;
+    }
+
+    const recorder = APP.rec.mediaRecorder;
+
+    recorder.onstop = () => {
+      APP.rec.blob = new Blob(APP.rec.chunks, {type:'audio/webm'});
+      APP.rec.active = false;
+      clearInterval(APP.rec.timer);
+
+      try {
+        if (recorder.stream) recorder.stream.getTracks().forEach(t => t.stop());
+      } catch(e) {}
+
+      if(document.getElementById('rec-ready')){
+        document.getElementById('rec-ready').style.display = 'block';
+      }
+
+      if(document.getElementById('rec-status')){
+        document.getElementById('rec-status').textContent = 'Recording complete ✓';
+      }
+
+      if(document.getElementById('btn-start')){
+        document.getElementById('btn-start').disabled = false;
+      }
+
+      if(document.getElementById('btn-stop')){
+        document.getElementById('btn-stop').disabled = true;
+      }
+
+      toast('Recording stopped','success');
+      resolve(APP.rec.blob);
+    };
+
+    recorder.stop();
+  });
+}
+
+function blobToBase64(blob){
+  return new Promise(res=>{const r=new FileReader();r.onloadend=()=>res(r.result.split(',')[1]);r.readAsDataURL(blob);});
+}
+
+// ── SUBMIT CRO ─────────────────────────────────────────
+async function submitCRO(){
+  const teacherEl = document.getElementById('f-teacher');
+  const cls       = document.getElementById('f-class').value;
+  const section   = document.getElementById('f-section').value;
+  const subject   = document.getElementById('f-subject').value;
+  const topic     = document.getElementById('f-topic').value.trim();
+  const good      = document.getElementById('f-good').value.trim();
+
+  if(!teacherEl.value){ toast('Please select a teacher','error'); return; }
+  if(!cls){ toast('Please select a class','error'); return; }
+  if(!section){ toast('Please select a section','error'); return; }
+  if(!subject){ toast('Please select a subject','error'); return; }
+  if(!topic){ toast('Please enter the topic','error'); return; }
+  if(!good){ toast('Please enter good practices observed','error'); return; }
+  if(Object.keys(APP.formData.ratings).length<5){ toast('Please rate all 5 observation areas','error'); return; }
+
+  const btn=document.getElementById('btn-submit-cro');
+  btn.disabled=true; btn.textContent='Submitting...';
+
+  // Auto-stop recording if observer forgot to press Stop
+if(APP.rec.active && APP.rec.mediaRecorder){
+  btn.textContent = 'Stopping recording...';
+  await stopRec();
+  btn.textContent = 'Submitting...';
+}
+
+  const teacherObj = APP.cache.teachers.find(t=>t.teacherEmail===teacherEl.value);
+  const teacherName = teacherObj ? teacherObj.teacherName : teacherEl.value;
+
+  let audioBase64='', audioFileName='';
+  if(APP.rec.blob){
+    audioBase64 = await blobToBase64(APP.rec.blob);
+    const d=new Date().toISOString().split('T')[0];
+    const sch=APP.user.schoolName.replace(/\s+/g,'_');
+    const obs=APP.user.fullName.replace(/\s+/g,'');
+    const tch=teacherName.replace(/\s+/g,'');
+    const cl=cls.replace(/\s+/g,'');
+    audioFileName=`${sch}_${obs}_${tch}_${cl}${section}_${d}.webm`;
+  }
+
+  const payload={
+    action:'submitCRO',
+    schoolName:APP.user.schoolName,
+    observerEmail:APP.user.email,
+    observerName:APP.user.fullName,
+    observerDesignation:APP.user.role,
+    teacherEmail:teacherEl.value,
+    teacherName,
+    department:teacherObj?.department||APP.user.department,
+    class:cls, section, subject,
+    subjectType:document.getElementById('f-subjecttype').value,
+    topic,
+    period:document.getElementById('f-period').value,
+    croType:document.getElementById('f-crotype').value,
+    area1Score:APP.formData.ratings[1]||'',
+    area1Remarks:document.getElementById('rem-1').value,
+    area2Score:APP.formData.ratings[2]||'',
+    area2Remarks:document.getElementById('rem-2').value,
+    area3Score:APP.formData.ratings[3]||'',
+    area3Remarks:document.getElementById('rem-3').value,
+    area4Score:APP.formData.ratings[4]||'',
+    area4Remarks:document.getElementById('rem-4').value,
+    area5Score:APP.formData.ratings[5]||'',
+    area5Remarks:document.getElementById('rem-5').value,
+    goodPractices:good,
+    areasForImprovement:document.getElementById('f-improve').value,
+    supportNeeded:document.getElementById('f-support').value,
+    followUpRequired:APP.formData.followUp,
+    bestPracticeShareable:APP.formData.bestPrac,
+    actionDueDate:document.getElementById('f-duedate')?document.getElementById('f-duedate').value:'',
+    audioBase64, audioFileName
+  };
+
+  try{
+    const res=await apiPost(payload);
+    if(res.status==='success'){
+      toast('CRO submitted successfully ✅','success');
+      APP.rec={mediaRecorder:null,chunks:[],blob:null,timer:null,seconds:0,active:false};
+      switchTab('my-cros');
+    } else {
+      toast('Submission failed: '+res.message,'error');
+      btn.disabled=false; btn.textContent='✅ Submit CRO Report';
+    }
+  } catch(e){
+    toast('Connection error. Please try again.','error');
+    btn.disabled=false; btn.textContent='✅ Submit CRO Report';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// MY CROs
+// ══════════════════════════════════════════════════════
+async function renderMyCROs(el){
+  try{
+    const res=await apiGet({action:'getCRORecords',email:APP.user.email,role:APP.user.role,schoolName:APP.user.schoolName});
+    const records=res.records||[];
+    if(!records.length){ el.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><p>No CRO records yet.</p></div>`; return; }
+    el.innerHTML=`<div class="section-hdr">All My CROs (${records.length})</div>`+
+      records.slice().reverse().map(r=>`
+        <div class="record-item">
+          <div class="record-item-header">
+            <div>
+              <div class="record-item-title">${r.TeacherName||r.TeacherEmail}</div>
+              <div class="record-item-sub">${r.Class||''} ${r.Section||''} · ${r.Subject||''} · ${r.Topic||''}</div>
+              <div class="record-item-sub">${fmtDate(r.SubmittedDate)}</div>
+            </div>
+            <span class="badge badge-${badgeClass(r.Status)}">${r.Status||'—'}</span>
+          </div>
+          <div class="score-grid">
+            ${AREA_NAMES.map((n,i)=>`
+              <div class="score-item">
+                <div class="score-label">${n.substring(0,24)}…</div>
+                <div class="score-val">${r['Area'+(i+1)+'Score']||'—'}/4</div>
+              </div>`).join('')}
+          </div>
+          ${r.RecordingLink?`<div style="margin-top:8px;"><a href="${r.RecordingLink}" target="_blank" style="color:var(--blue-mid);font-size:12px;">🎙️ Play Recording</a></div>`:''}
+        </div>`).join('');
+  } catch(e){ el.innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load records.</p></div>`; }
+}
+
+// ══════════════════════════════════════════════════════
+// VERIFY
+// ══════════════════════════════════════════════════════
+async function renderVerify(el){
+  try{
+    const res=await apiGet({action:'getActionItems',email:APP.user.email,role:APP.user.role});
+    const items=(res.items||[]).filter(i=>i.VerificationStatus==='Pending'&&i.TeacherActionTaken);
+    if(!items.length){ el.innerHTML=`<div class="empty"><div class="empty-icon">✅</div><p>No pending verifications.</p></div>`; return; }
+    el.innerHTML=`<div class="section-hdr">Pending Verification (${items.length})</div>`+
+      items.map((item,idx)=>`
+        <div class="record-item">
+          <div class="record-item-title">${item.TeacherName||item.TeacherEmail}</div>
+          <div class="record-item-sub">Record: ${item.CRORecordID}</div>
+          <div style="margin:8px 0;font-size:13px;"><strong>Action Point:</strong> ${item.ActionPoint}</div>
+          <div style="margin:8px 0;font-size:13px;background:var(--green-light);padding:8px;border-radius:6px;">
+            <strong>Teacher's Response:</strong><br>${item.TeacherActionTaken}
+          </div>
+          <div class="form-group">
+            <textarea class="form-control" id="vrem-${idx}" rows="2" placeholder="Verification remarks (optional)"></textarea>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn-success btn-sm" onclick="verifyAction('${item.CRORecordID}','Approved',${idx})">✅ Approve</button>
+            <button class="btn-danger btn-sm" onclick="verifyAction('${item.CRORecordID}','Revision Required',${idx})">↩️ Revision</button>
+          </div>
+        </div>`).join('');
+  } catch(e){ el.innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load items.</p></div>`; }
+}
+
+async function verifyAction(recordID,status,idx){
+  const remarks=document.getElementById('vrem-'+idx).value;
+  try{
+    const res=await apiPost({action:'verifyAction',recordID,verificationStatus:status,verifiedBy:APP.user.email,verifierRole:APP.user.role,remarks});
+    if(res.status==='success'){ toast(status==='Approved'?'Approved and closed ✅':'Revision requested','success'); switchTab('verify'); }
+    else toast('Error: '+res.message,'error');
+  } catch(e){ toast('Connection error','error'); }
+}
+
+// ══════════════════════════════════════════════════════
+// TEACHER VIEWS
+// ══════════════════════════════════════════════════════
+async function renderMyReports(el){
+  try{
+    var res=await apiGet({action:'getCRORecords',email:APP.user.email,role:'Teacher',schoolName:APP.user.schoolName});
+    var records=res.records||[];
+    if(!records.length){
+      el.innerHTML='<div class="empty"><div class="empty-icon">📄</div><p>No CRO reports yet.</p></div>';
+      return;
+    }
+    var PARAM_SHORT=['Pedagogy','Student Invt.','Language','Learning Env','Resources'];
+    var srNo=1;
+    var tableRows='';
+    var sorted=records.slice().reverse();
+    for(var ri=0;ri<sorted.length;ri++){
+      var r=sorted[ri];
+      var scores=[];
+      for(var ai=1;ai<=5;ai++){
+        var s=parseFloat(r['Area'+ai+'Score']);
+        scores.push((!isNaN(s)&&s>0)?s:null);
+      }
+      var valid=scores.filter(function(s){return s!==null;});
+      var avg=valid.length>0?(valid.reduce(function(a,b){return a+b;},0)/valid.length).toFixed(2):'—';
+      var grade=getGrade(avg);
+      var col=gradeColor(avg);
+      var scoreCells='';
+      for(var si=0;si<scores.length;si++){
+        var sv=scores[si];
+        scoreCells+='<td style="padding:6px 5px;font-size:12px;text-align:center;font-weight:600;color:'+(sv?gradeColor(sv):'var(--gray)')+';">'+(sv||'—')+'</td>';
+      }
+      tableRows+='<tr style="border-bottom:1px solid var(--border);">'
+        +'<td style="padding:6px 8px;font-size:12px;color:var(--gray);text-align:center;">'+(srNo++)+'</td>'
+        +'<td style="padding:6px 8px;font-size:12px;white-space:nowrap;">'+fmtDate(r.SubmittedDate)+'</td>'
+        +'<td style="padding:6px 8px;font-size:12px;white-space:nowrap;">'+(r.Class||'')+' '+(r.Section||'')+'</td>'
+        +'<td style="padding:6px 8px;font-size:12px;">'+(r.Subject||'')+'</td>'
+        +'<td style="padding:6px 8px;font-size:12px;white-space:nowrap;">'+(r.ObserverName||r.ObserverDesignation||'')+'</td>'
+        +scoreCells
+        +'<td style="padding:6px 8px;font-size:12px;text-align:center;font-weight:700;color:'+col+';">'+avg+'</td>'
+        +'<td style="padding:6px 8px;font-size:11px;white-space:nowrap;color:'+col+';font-weight:600;">'+grade+'</td>'
+        +'<td style="padding:6px 8px;"><span class="badge badge-'+badgeClass(r.Status)+'">'+(r.Status||'—')+'</span></td>'
+        +'</tr>';
+    }
+    var paramHeaderCells='';
+    for(var pi=0;pi<PARAM_SHORT.length;pi++){
+      paramHeaderCells+='<th style="padding:7px 4px;font-size:10px;text-align:center;">'+PARAM_SHORT[pi]+'</th>';
+    }
+    el.innerHTML=''
+      +'<div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:12px;">'
+      +'<div class="stat-card" style="border-top:3px solid var(--blue);"><div style="font-size:11px;color:var(--gray);margin-bottom:4px;">Total CROs</div><div style="font-size:24px;font-weight:700;color:var(--blue);">'+records.length+'</div></div>'
+      +'<div class="stat-card" style="border-top:3px solid var(--green);"><div style="font-size:11px;color:var(--gray);margin-bottom:4px;">Closed</div><div style="font-size:24px;font-weight:700;color:var(--green);">'+records.filter(function(r){return r.Status==='Closed';}).length+'</div></div>'
+      +'<div class="stat-card" style="border-top:3px solid var(--orange);"><div style="font-size:11px;color:var(--gray);margin-bottom:4px;">Pending</div><div style="font-size:24px;font-weight:700;color:var(--orange);">'+records.filter(function(r){return r.Status==='Submitted'||r.Status==='Action Required';}).length+'</div></div>'
+      +'</div>'
+      +'<div class="card" style="padding:0;overflow:hidden;"><div style="overflow-x:auto;">'
+      +'<table style="width:100%;border-collapse:collapse;min-width:800px;">'
+      +'<thead><tr style="background:var(--blue-light);">'
+      +'<th style="padding:7px 6px;font-size:10px;text-align:center;">#</th>'
+      +'<th style="padding:7px 6px;font-size:10px;text-align:left;">Date</th>'
+      +'<th style="padding:7px 6px;font-size:10px;text-align:left;">Class</th>'
+      +'<th style="padding:7px 6px;font-size:10px;text-align:left;">Subject</th>'
+      +'<th style="padding:7px 6px;font-size:10px;text-align:left;">Observer</th>'
+      +paramHeaderCells
+      +'<th style="padding:7px 6px;font-size:10px;text-align:center;background:var(--blue);color:white;">Avg</th>'
+      +'<th style="padding:7px 6px;font-size:10px;text-align:left;">Grade</th>'
+      +'<th style="padding:7px 6px;font-size:10px;text-align:left;">Status</th>'
+      +'</tr></thead>'
+      +'<tbody>'+tableRows+'</tbody>'
+      +'</table></div></div>';
+  } catch(e){ el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load reports.</p></div>'; }
+}
+
+
+async function renderPendingAck(el){
+  try{
+    const res=await apiGet({action:'getCRORecords',email:APP.user.email,role:'Teacher',schoolName:APP.user.schoolName});
+    const pending=(res.records||[]).filter(r=>r.Status==='Submitted');
+    if(!pending.length){ el.innerHTML=`<div class="empty"><div class="empty-icon">🎉</div><p>No pending acknowledgements.</p></div>`; return; }
+    el.innerHTML=`<div class="section-hdr">Pending Acknowledgement (${pending.length})</div>`+
+      pending.map(r=>`
+        <div class="record-item">
+          <div class="record-item-title">${r.Class||''} ${r.Section||''} · ${r.Subject||''}</div>
+          <div class="record-item-sub">Observer: ${r.ObserverName||''} · ${fmtDate(r.SubmittedDate)}</div>
+          <div class="record-item-sub">Topic: ${r.Topic||''}</div>
+          <div class="score-grid" style="margin-top:8px;">
+            ${AREA_NAMES.map((n,i)=>`
+              <div class="score-item">
+                <div class="score-label">${n.substring(0,24)}…</div>
+                <div class="score-val">${r['Area'+(i+1)+'Score']||'—'}/4</div>
+              </div>`).join('')}
+          </div>
+          <div style="margin:8px 0;font-size:12px;background:var(--blue-light);padding:10px;border-radius:7px;">
+            <strong>Good Practices:</strong> ${r.GoodPractices||'—'}<br><br>
+            <strong>Areas for Improvement:</strong> ${r.AreasForImprovement||'—'}<br><br>
+            <strong>Follow-up Required:</strong> ${r.FollowUpRequired||'—'}
+          </div>
+          <button class="btn-submit" onclick="acknowledgeRecord('${r.CRORecordID}',this)">✅ Acknowledge this Report</button>
+        </div>`).join('');
+  } catch(e){ el.innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load records.</p></div>`; }
+}
+
+async function acknowledgeRecord(recordID,btn){
+  btn.disabled=true; btn.textContent='Acknowledging...';
+  try{
+    const res=await apiPost({action:'acknowledgeCRO',recordID,teacherEmail:APP.user.email});
+    if(res.status==='success'){
+      toast(res.newStatus==='Closed'?'Acknowledged — CRO closed ✅':'Acknowledged — please submit Action Taken','success');
+      switchTab('pending-ack');
+    } else { toast('Error: '+res.message,'error'); btn.disabled=false; btn.textContent='✅ Acknowledge this Report'; }
+  } catch(e){ toast('Connection error','error'); btn.disabled=false; btn.textContent='✅ Acknowledge this Report'; }
+}
+
+async function renderActionTaken(el){
+  try{
+    const res=await apiGet({action:'getActionItems',email:APP.user.email,role:'Teacher'});
+    const pending=(res.items||[]).filter(i=>i.FinalStatus==='Open');
+    if(!pending.length){ el.innerHTML=`<div class="empty"><div class="empty-icon">✅</div><p>No pending action items.</p></div>`; return; }
+    el.innerHTML=`<div class="section-hdr">Pending Action Taken (${pending.length})</div>`+
+      pending.map((item,idx)=>{
+        // If already submitted and awaiting review — show read-only state
+        const alreadySubmitted = item.TeacherActionTaken && item.VerificationStatus==='Pending';
+        const needsRevision    = item.VerificationStatus==='Revision Required';
+        const needsEntry       = !item.TeacherActionTaken;
+
+        return `<div class="record-item">
+          <div class="record-item-title">Action Required</div>
+          <div class="record-item-sub">Record: ${item.CRORecordID}</div>
+          <div class="info-box orange" style="margin-top:8px;"><strong>Action Point:</strong><br>${item.ActionPoint||'—'}</div>
+
+          ${needsRevision?`<div class="info-box" style="background:var(--red-light);color:#721c24;margin-top:6px;">
+            <strong>↩️ Revision Requested by Observer:</strong><br>${item.VerificationRemarks||'Please revise your action taken.'}
+          </div>`:''}
+
+          ${alreadySubmitted && !needsRevision?`
+            <div class="info-box green" style="margin-top:8px;">
+              <strong>✅ Action Taken Submitted</strong><br>
+              Awaiting review by your observer. You will be notified once reviewed.
+            </div>
+            <div style="background:var(--gray-light);border-radius:8px;padding:10px 12px;font-size:13px;margin-top:6px;">
+              <strong>Your response:</strong><br>${item.TeacherActionTaken}
+            </div>`:`
+            <div class="form-group" style="margin-top:8px;">
+              <label class="form-label">Your Action Taken <span class="req">*</span></label>
+              <textarea class="form-control" id="act-${idx}" rows="3"
+                placeholder="Describe what you did to address this improvement point">${item.TeacherActionTaken||''}</textarea>
+            </div>
+            <button class="btn-submit" onclick="submitAction('${item.CRORecordID}',${idx},this)">
+              📝 ${needsRevision?'Resubmit Action Taken':'Submit Action Taken'}
+            </button>`}
+        </div>`;
+      }).join('');
+  } catch(e){ el.innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load items.</p></div>`; }
+}
+
+async function submitAction(recordID,idx,btn){
+  const actionTaken=document.getElementById('act-'+idx).value.trim();
+  if(!actionTaken){ toast('Please describe the action taken','error'); return; }
+  btn.disabled=true; btn.textContent='Submitting...';
+  try{
+    const res=await apiPost({action:'submitAction',recordID,teacherEmail:APP.user.email,actionTaken});
+    if(res.status==='success'){ toast('Action Taken submitted ✅','success'); switchTab('action-taken'); }
+    else { toast('Error: '+res.message,'error'); btn.disabled=false; btn.textContent='📝 Submit Action Taken'; }
+  } catch(e){ toast('Connection error','error'); btn.disabled=false; btn.textContent='📝 Submit Action Taken'; }
+}
+
+// Teacher profile / update classes
+function renderMyProfile(el){
+  const school=APP.user.schoolName;
+  const classes=SCHOOL_CLASSES[school]||[];
+  APP.setupRows=0;
+  el.innerHTML=`
+    <div class="card">
+      <div class="card-title">👤 My Classes and Subjects</div>
+      <div class="info-box">Update the classes you currently teach. This replaces your previous setup.</div>
+      <div id="assignment-rows-profile"></div>
+      <button class="btn-add-row" onclick="addProfileRow()">＋ Add Class</button>
+      <button class="btn-submit" style="margin-top:14px;" onclick="saveProfileSetup()">✅ Update My Classes</button>
+    </div>`;
+  addProfileRow();
+}
+
+function addProfileRow(){
+  APP.setupRows++;
+  const idx=APP.setupRows;
+  const school=APP.user.schoolName;
+  const classes=SCHOOL_CLASSES[school]||[];
+  const classOpts=classes.map(c=>`<option value="${c}">${c}</option>`).join('');
+  const secOpts=SECTIONS.map(s=>`<option value="${s}">${s}</option>`).join('');
+  const div=document.createElement('div');
+  div.className='assignment-row'; div.id='prow-'+idx;
+  div.innerHTML=`
+    <select class="form-control" id="psubj-${idx}"><option value="">Subject</option><option value="${APP.user.department}">${APP.user.department}</option></select>
+    <select class="form-control" id="pcls-${idx}"><option value="">Class</option>${classOpts}</select>
+    <select class="form-control" id="psec-${idx}"><option value="">Section</option>${secOpts}</select>
+    <button class="btn-remove-row" onclick="document.getElementById('prow-${idx}').remove()">✕</button>`;
+  document.getElementById('assignment-rows-profile').appendChild(div);
+}
+
+async function saveProfileSetup(){
+  const rows=document.querySelectorAll('[id^="prow-"]');
+  const assignments=[];
+  rows.forEach(row=>{
+    const idx=row.id.replace('prow-','');
+    const s=document.getElementById('psubj-'+idx)?.value;
+    const c=document.getElementById('pcls-'+idx)?.value;
+    const sec=document.getElementById('psec-'+idx)?.value;
+    if(s&&c&&sec) assignments.push({subject:s,class:c,section:sec});
+  });
+  if(!assignments.length){ toast('Please add at least one class','error'); return; }
+  try{
+    const res=await apiPost({action:'saveAssignments',teacherEmail:APP.user.email,teacherName:APP.user.fullName,schoolName:APP.user.schoolName,department:APP.user.department,assignments});
+    if(res.status==='success') toast('Classes updated ✅','success');
+    else toast('Error: '+res.message,'error');
+  } catch(e){ toast('Connection error','error'); }
+}
+
+// ══════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════
+// ── SHARED DASHBOARD HELPERS ──────────────────────────────────
+
+function scoreBar(avg, showLabel=true){
+  if(avg==='—'||avg===undefined||avg===null) return '<span style="color:var(--gray)">No data</span>';
+  const val = parseFloat(avg);
+  const pct = (val/4)*100;
+  const col = pct>=75?'#1e7e34':pct>=50?'#2e6da4':pct>=37?'#e67e22':'#c0392b';
+  const level = pct>=75?'Exemplary':pct>=50?'Proficient':pct>=37?'Progressing':'Beginner';
+  return `<div style="display:flex;align-items:center;gap:8px;">
+    <div style="flex:1;background:#e9ecef;border-radius:6px;height:10px;">
+      <div style="width:${pct}%;background:${col};height:10px;border-radius:6px;transition:width .4s;"></div>
+    </div>
+    ${showLabel?`<span style="font-size:11px;font-weight:700;color:${col};min-width:36px;">${avg}/4</span>
+    <span style="font-size:10px;color:${col};min-width:70px;">${level}</span>`:''}
+  </div>`;
+}
+
+function statCard(number, label, color='var(--blue)', icon=''){
+  return `<div class="stat-card" style="border-top:3px solid ${color};">
+    <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">${icon} ${label}</div>
+    <div style="font-size:28px;font-weight:700;color:${color};">${number}</div>
+  </div>`;
+}
+
+function sectionHeader(title){
+  return `<div style="display:flex;align-items:center;gap:10px;margin:16px 0 10px;">
+    <div style="width:4px;height:20px;background:var(--blue-mid);border-radius:2px;"></div>
+    <span style="font-size:13px;font-weight:700;color:var(--blue);">${title}</span>
+  </div>`;
+}
+
+function paramTable(paramScores){
+  if(!paramScores||!paramScores.length) return '';
+  return `<div class="card">
+    ${sectionHeader('Parameter-wise Average Scores')}
+    <div style="background:var(--blue-light);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--blue);margin-bottom:14px;">
+      4 = Exemplary &nbsp;|&nbsp; 3 = Proficient &nbsp;|&nbsp; 2 = Progressing &nbsp;|&nbsp; 1 = Beginner
+    </div>
+    ${paramScores.map((p,i)=>`
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <span style="font-size:12px;font-weight:600;color:#333;">${i+1}. ${p.name}</span>
+          <span style="font-size:10px;color:var(--gray);background:var(--gray-light);padding:2px 6px;border-radius:10px;">${p.count} obs.</span>
+        </div>
+        ${scoreBar(p.avg)}
+      </div>`).join('')}
+  </div>`;
+}
+
+function trendChart(monthlyTrend){
+  if(!monthlyTrend||!monthlyTrend.length) return '';
+  const max=Math.max(...monthlyTrend.map(m=>m.count),1);
+  const total=monthlyTrend.reduce((s,m)=>s+m.count,0);
+  if(total===0) return `<div class="card">${sectionHeader('Monthly CRO Trend')}
+    <div class="empty" style="padding:20px;"><div class="empty-icon">📈</div><p>No data yet for trend</p></div></div>`;
+  return `<div class="card">
+    ${sectionHeader('Monthly CRO Trend')}
+    <div style="display:flex;align-items:flex-end;gap:6px;height:100px;padding:8px 0 4px;">
+      ${monthlyTrend.map(m=>{
+        const h=Math.max((m.count/max)*72,m.count>0?6:0);
+        const col=m.count>0?'var(--blue-mid)':'#e9ecef';
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <span style="font-size:10px;font-weight:700;color:var(--blue);min-height:14px;">${m.count||''}</span>
+          <div style="width:100%;height:${h}px;background:${col};border-radius:4px 4px 0 0;"></div>
+          <span style="font-size:9px;color:var(--gray);white-space:nowrap;">${m.label}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function recordingsSection(records){
+  const withRec=(records||[]).filter(r=>r.RecordingLink&&r.RecordingLink.startsWith('http')).slice(-8).reverse();
+  if(!withRec.length) return '';
+  return `<div class="card">
+    ${sectionHeader('Recent Class Recordings')}
+    ${withRec.map(r=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;
+        padding:10px 0;border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--blue);">${r.TeacherName||r.TeacherEmail}</div>
+          <div style="font-size:11px;color:var(--gray);margin-top:2px;">${r.SchoolName||''} · ${r.Class||''} ${r.Section||''} · ${r.Subject||''}</div>
+          <div style="font-size:11px;color:var(--gray);">${fmtDate(r.SubmittedDate)}</div>
+        </div>
+        <a href="${r.RecordingLink}" target="_blank"
+          style="background:var(--blue);color:white;padding:7px 14px;border-radius:6px;
+          font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;margin-left:8px;">
+          ▶ Play
+        </a>
+      </div>`).join('')}
+  </div>`;
+}
+
+function bestPracticesSection(practices){
+  if(!practices||!practices.length) return '';
+  return `<div class="card">
+    ${sectionHeader('Best Practices Identified')}
+    ${practices.reverse().map(r=>`
+      <div style="background:var(--green-light);border-left:4px solid var(--green);
+        border-radius:0 7px 7px 0;padding:10px 12px;margin-bottom:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--green);">${r.teacher||''}${r.school?' — '+r.school:''}</div>
+        <div style="font-size:12px;color:#333;margin-top:3px;line-height:1.4;">${r.practice||''}</div>
+        <div style="font-size:10px;color:var(--gray);margin-top:4px;">${fmtDate(r.date)}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// ── DASHBOARD HEADER ───────────────────────────────────────────
+function dashHeader(title, subtitle){
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+  return `<div style="background:white;border-radius:var(--radius);padding:14px 16px;
+    margin-bottom:12px;box-shadow:var(--shadow);border-left:5px solid var(--blue);">
+    <div style="font-size:15px;font-weight:700;color:var(--blue);">${title}</div>
+    ${subtitle?`<div style="font-size:12px;color:var(--gray);margin-top:2px;">${subtitle}</div>`:''}
+    <div style="font-size:11px;color:var(--gray);margin-top:4px;">📅 ${dateStr}</div>
+  </div>`;
+}
+
+async function renderDashboard(el){
+  el.innerHTML=`<div class="loading"><div class="spinner"></div><div>Loading dashboard...</div></div>`;
+  try{
+    const res=await apiGet({action:'getDashboard',email:APP.user.email,role:APP.user.role,schoolName:APP.user.schoolName});
+    if(!res||res.status!=='success'){
+      el.innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load dashboard.</p></div>`;
+      return;
+    }
+    const d=res.dashboard;
+    const role=APP.user.role;
+
+    // ── OBSERVER DASHBOARD ──────────────────────────────────
+    const pureObservers=['CoordinatorPrimary','CoordinatorHighSchool','PPHead','Supervisor','VicePrincipal'];
+    if(pureObservers.includes(role)){
+      const teacherRows=Object.entries(d.teacherScores||{})
+        .sort((a,b)=>b[1].total-a[1].total)
+        .map(([t,v])=>`<tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px;font-size:13px;">${t}</td>
+          <td style="padding:8px;font-size:13px;text-align:center;font-weight:700;">${v.total}</td>
+          <td style="padding:8px;font-size:13px;min-width:160px;">${scoreBar(v.avgScore)}</td>
+        </tr>`).join('');
+
+      el.innerHTML=
+        dashHeader('My Observation Dashboard', APP.user.fullName+' · '+APP.user.schoolName)+`
+        <div class="stats-grid">
+          ${statCard(d.total,'Total CROs','var(--blue)','📋')}
+          ${statCard(d.thisMonthCount,'This Month','var(--blue-mid)','📅')}
+          ${statCard(d.ackPending,'Pending Ack.','var(--orange)','🔔')}
+          ${statCard(d.actionPending||0,'Action Pending','var(--red)','⚠️')}
+          ${statCard(d.closed,'Closed','var(--green)','✅')}
+          ${statCard(d.avgScore,'Avg Score /4','#7b2d8b','⭐')}
+        </div>
+        ${paramTable(d.paramScores)}
+        ${trendChart(d.monthlyTrend)}
+        ${teacherRows?`<div class="card">
+          ${sectionHeader('Teacher-wise Scores')}
+          <table style="width:100%;border-collapse:collapse;">
+            <tr style="background:var(--blue-light);">
+              <th style="padding:8px;font-size:11px;text-align:left;">Teacher</th>
+              <th style="padding:8px;font-size:11px;text-align:center;">CROs</th>
+              <th style="padding:8px;font-size:11px;text-align:left;min-width:160px;">Avg Score</th>
+            </tr>${teacherRows}
+          </table></div>`:''}`;
+      return;
+    }
+
+    // ── PRINCIPAL DASHBOARD ─────────────────────────────────
+    if(role==='Principal'){
+      // Load teacher stats with linked schools support
+      const statsRes = await apiGet({
+        action:'getTeacherStats',
+        schoolName:APP.user.schoolName,
+        email:APP.user.email
+      });
+      const teacherStats = statsRes.teacherStats || [];
+      const linkedSchools = statsRes.linkedSchools || [APP.user.schoolName];
+      const hasLinked = linkedSchools.length > 1;
+      const schoolLabel = linkedSchools.join(' + ');
+
+      const deptRows=Object.entries(d.departments||{})
+        .sort((a,b)=>parseFloat(b[1].avgScore||0)-parseFloat(a[1].avgScore||0))
+        .map(([dept,v])=>`<tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px;font-size:13px;">${dept}</td>
+          <td style="padding:8px;font-size:13px;text-align:center;">${v.total}</td>
+          <td style="padding:8px;min-width:160px;">${scoreBar(v.avgScore)}</td>
+        </tr>`).join('');
+
+      const obsRows=Object.entries(d.observers||{})
+        .sort((a,b)=>b[1].total-a[1].total)
+        .map(([o,v])=>`<tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px;font-size:13px;">${o}</td>
+          <td style="padding:8px;font-size:13px;text-align:center;font-weight:700;">${v.total}</td>
+          <td style="padding:8px;font-size:13px;text-align:center;">${v.thisMonth||0}</td>
+          <td style="padding:8px;font-size:13px;text-align:center;">${v.followUp||0}</td>
+        </tr>`).join('');
+
+      const lowRows=(d.lowScoreObs||[]).map(r=>`
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px;font-size:12px;">${r.teacher}</td>
+          <td style="padding:8px;font-size:12px;">${r.class} · ${r.subject}</td>
+          <td style="padding:8px;font-size:12px;text-align:center;color:var(--red);font-weight:700;">${r.avg}/4</td>
+        </tr>`).join('');
+
+      // Teacher stats table rows (all teachers including zero)
+      const teacherTableRows = teacherStats.map(t=>`
+        <tr class="teacher-stat-row" style="border-bottom:1px solid var(--border);"
+          data-name="${t.name.toLowerCase()}" data-dept="${(t.department||'').toLowerCase()}">
+          <td style="padding:8px;font-size:13px;font-weight:500;">${t.name}</td>
+          <td style="padding:8px;font-size:12px;color:var(--gray);">${t.department||'—'}</td>
+          ${hasLinked?`<td style="padding:8px;font-size:11px;color:var(--gray);">${t.school||'—'}</td>`:''}
+          <td style="padding:8px;font-size:13px;text-align:center;font-weight:700;
+            color:${t.total>0?'var(--blue)':'var(--gray)'};">${t.total}</td>
+          <td style="padding:8px;font-size:13px;text-align:center;
+            color:${t.thisMonth>0?'var(--green)':'var(--gray)'};">${t.thisMonth}</td>
+        </tr>`).join('');
+
+      el.innerHTML=
+        dashHeader('Principal Dashboard', schoolLabel)+`
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <button id="btn-consolidated" class="btn-secondary" onclick="downloadConsolidatedReport()"
+            style="flex:1;min-width:180px;font-size:12px;padding:10px;">
+            ⬇️ Teacher Consolidated Report
+          </button>
+          <button id="btn-all-obs" class="btn-secondary" onclick="downloadAllObsReport()"
+            style="flex:1;min-width:180px;font-size:12px;padding:10px;">
+            ⬇️ All Observations Report
+          </button>
+        </div>
+        <div class="stats-grid">
+          ${statCard(d.total,'Total CROs','var(--blue)','📋')}
+          ${statCard(d.thisMonthCount,'This Month','var(--blue-mid)','📅')}
+          ${statCard(d.ackPending,'Pending Ack.','var(--orange)','🔔')}
+          ${statCard(d.followUp,'Follow-ups','var(--red)','⚠️')}
+          ${statCard(d.bestPrac,'Best Practices','var(--green)','⭐')}
+          ${statCard(d.avgScore,'School Avg /4','#7b2d8b','📊')}
+        </div>
+        ${paramTable(d.paramScores)}
+        ${trendChart(d.monthlyTrend)}
+
+        ${teacherTableRows?`<div class="card">
+          ${sectionHeader('Teacher-wise Observation Count')}
+          <div style="margin-bottom:10px;">
+            <input type="text" id="teacher-search" class="form-control"
+              placeholder="🔍 Search by teacher name or department..."
+              oninput="filterTeacherTable()"
+              style="font-size:13px;"/>
+          </div>
+          <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;" id="teacher-stat-table">
+            <tr style="background:var(--blue-light);">
+              <th style="padding:8px;font-size:11px;text-align:left;">Teacher Name</th>
+              <th style="padding:8px;font-size:11px;text-align:left;">Department</th>
+              ${hasLinked?'<th style="padding:8px;font-size:11px;text-align:left;">School</th>':''}
+              <th style="padding:8px;font-size:11px;text-align:center;">Total CROs</th>
+              <th style="padding:8px;font-size:11px;text-align:center;">This Month</th>
+            </tr>${teacherTableRows}
+          </table></div>
+          <div id="teacher-no-results" style="display:none;text-align:center;padding:16px;color:var(--gray);font-size:13px;">
+            No teachers found matching your search.
+          </div>
+        </div>`:''}
+
+        ${deptRows?`<div class="card">
+          ${sectionHeader('Department-wise Scores')}
+          <table style="width:100%;border-collapse:collapse;">
+            <tr style="background:var(--blue-light);">
+              <th style="padding:8px;font-size:11px;text-align:left;">Department</th>
+              <th style="padding:8px;font-size:11px;text-align:center;">CROs</th>
+              <th style="padding:8px;font-size:11px;text-align:left;min-width:160px;">Avg Score</th>
+            </tr>${deptRows}
+          </table></div>`:''}
+
+        ${obsRows?`<div class="card">
+          ${sectionHeader('Observer Activity')}
+          <table style="width:100%;border-collapse:collapse;">
+            <tr style="background:var(--blue-light);">
+              <th style="padding:8px;font-size:11px;text-align:left;">Observer</th>
+              <th style="padding:8px;font-size:11px;text-align:center;">Total</th>
+              <th style="padding:8px;font-size:11px;text-align:center;">This Month</th>
+              <th style="padding:8px;font-size:11px;text-align:center;">Follow-ups</th>
+            </tr>${obsRows}
+          </table></div>`:''}
+
+        ${lowRows?`<div class="card">
+          ${sectionHeader('⚠️ Low Score Observations (below 2.5)')}
+          <table style="width:100%;border-collapse:collapse;">
+            <tr style="background:var(--red-light);">
+              <th style="padding:8px;font-size:11px;text-align:left;">Teacher</th>
+              <th style="padding:8px;font-size:11px;text-align:left;">Class · Subject</th>
+              <th style="padding:8px;font-size:11px;text-align:center;">Avg</th>
+            </tr>${lowRows}
+          </table></div>`:''}
+
+        ${bestPracticesSection(d.bestPractices)}`;
+      return;
+    }
+
+    // ── MANAGEMENT / SUPERADMIN DASHBOARD ───────────────────
+    const roleClean = (role||'').trim();
+    if(roleClean==='Management'||roleClean==='SuperAdmin'||roleClean==='SchoolAdmin'){
+      let allRecords=[];
+      try{
+        const allRecordsRes=await apiGet({action:'getCRORecords',email:APP.user.email,role:APP.user.role,schoolName:APP.user.schoolName});
+        allRecords=allRecordsRes.records||[];
+      } catch(e){ console.warn('allRecords fetch failed:', e); }
+
+      // Build school list for parameter dropdown
+      const schoolNames = Object.keys(d.schools||{});
+
+      const schoolCards=Object.entries(d.schools||{})
+        .sort((a,b)=>b[1].total-a[1].total)
+        .map(([s,v])=>`
+          <div style="background:white;border-radius:var(--radius);padding:14px;
+            margin-bottom:10px;box-shadow:var(--shadow);border-left:4px solid var(--blue-mid);">
+            <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px;">${s}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+              <div style="text-align:center;">
+                <div style="font-size:20px;font-weight:700;color:var(--blue);">${v.total}</div>
+                <div style="font-size:10px;color:var(--gray);">Total</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:20px;font-weight:700;color:var(--green);">${v.closed}</div>
+                <div style="font-size:10px;color:var(--gray);">Closed</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:20px;font-weight:700;color:var(--orange);">${v.followUp}</div>
+                <div style="font-size:10px;color:var(--gray);">Follow-up</div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">Average Score</div>
+            ${scoreBar(v.avgScore)}
+          </div>`).join('');
+
+          el.innerHTML=
+            dashHeader('Management Dashboard', 'All Schools Overview')
+            + '<div class="stats-grid">'
+            + statCard(d.total,'Total CROs','var(--blue)','📋')
+            + statCard(d.thisMonthCount,'This Month','var(--blue-mid)','📅')
+            + statCard(d.ackPending,'Pending Ack.','var(--orange)','🔔')
+            + statCard(d.followUp,'Follow-ups','var(--red)','⚠️')
+            + statCard(d.bestPrac,'Best Practices','var(--green)','⭐')
+            + statCard(d.avgScore,'Overall Avg /4','#7b2d8b','📊')
+            + '</div>'
+            + trendChart(d.monthlyTrend)
+            + (schoolCards ? '<div>' + sectionHeader('School-wise Summary') + schoolCards + '</div>' : '')
+            + '<div class="card">'
+            + sectionHeader('Parameter-wise Scores')
+            + '<div class="form-group" style="margin-bottom:14px;">'
+            + '<select class="form-control" id="param-school-filter" onchange="updateParamChart()">'
+            + '<option value="all">All Schools (Combined)</option>'
+            + schoolNames.map(function(s){return '<option value="'+s+'">'+s+'</option>';}).join('')
+            + '</select></div><div id="param-chart-container"></div></div>'
+            + '<div id="mgmt-low-scores"></div>'
+            + (bpCards ? '<div class="card">' + sectionHeader('Recent Best Practices') + bpCards + '</div>' : '')
+            + '<div class="card">' + sectionHeader('Download Reports')
+            + '<div style="margin-bottom:10px;"><div style="font-size:12px;color:var(--gray);margin-bottom:8px;">Select school for download:</div>'
+            + '<select class="form-control" id="mgmt-download-school" style="font-size:13px;margin-bottom:10px;">'
+            + '<option value="all">All Schools</option>'
+            + schoolNames.map(function(s){return '<option value="'+s+'">'+s+'</option>';}).join('')
+            + '</select></div>'
+            + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+            + '<button onclick="downloadMgmtConsolidated()" style="flex:1;min-width:180px;background:var(--blue);color:white;border:none;border-radius:8px;padding:11px 14px;font-size:13px;font-weight:600;cursor:pointer;">⬇️ Teacher Consolidated Report</button>'
+            + '<button onclick="downloadMgmtDetailed()" style="flex:1;min-width:180px;background:var(--green);color:white;border:none;border-radius:8px;padding:11px 14px;font-size:13px;font-weight:600;cursor:pointer;">⬇️ Detailed Observations Report</button>'
+            + '</div></div>'
+            + recordingsSection(allRecords)
+      window._mgsDashRecords = allRecords;
+      window._mgsDashParamScores = d.paramScores;
+      window._mgsDashSchools = d.schools;
+
+      // Load initial param chart
+      updateParamChart();
+
+      // Low score section
+      var lowScoreHtml = buildManagementLowScores(allRecords);
+      if(lowScoreHtml){
+        var container = document.getElementById('mgmt-low-scores');
+        if(!container){
+          var div = document.createElement('div');
+          div.id = 'mgmt-low-scores';
+          el.appendChild(div);
+        }
+        document.getElementById('mgmt-low-scores').innerHTML = lowScoreHtml;
+      }
+      return;
+    }
+
+    // RC dashboard — own stats + management view
+    if(role==='RC'){
+      const allRecordsRes = await apiGet({action:'getCRORecords',email:APP.user.email,role:'RC',schoolName:APP.user.schoolName});
+      const allRecords = allRecordsRes.records||[];
+
+      const schoolCounts = {};
+      allRecords.forEach(r=>{
+        const s = r.SchoolName||'Unknown';
+        if(!schoolCounts[s]) schoolCounts[s]=0;
+        schoolCounts[s]++;
+      });
+      const schoolRows = Object.entries(schoolCounts)
+        .sort((a,b)=>b[1]-a[1])
+        .map(([s,c])=>`<tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px;font-size:13px;">${s}</td>
+          <td style="padding:8px;font-size:13px;text-align:center;font-weight:700;">${c}</td>
+        </tr>`).join('');
+
+      el.innerHTML=
+        dashHeader('Resource Centre Dashboard', APP.user.fullName)+`
+        <div class="stats-grid">
+          ${statCard(d.total,'Total CROs Conducted','var(--blue)','📋')}
+          ${statCard(d.thisMonthCount,'This Month','var(--blue-mid)','📅')}
+          ${statCard(Object.keys(schoolCounts).length,'Schools Visited','var(--green)','🏫')}
+          ${statCard(d.avgScore,'Avg Score Given','#7b2d8b','📊')}
+        </div>
+        ${paramTable(d.paramScores)}
+        ${trendChart(d.monthlyTrend)}
+        ${schoolRows?`<div class="card">
+          ${sectionHeader('School-wise CRO Count')}
+          <table style="width:100%;border-collapse:collapse;">
+            <tr style="background:var(--blue-light);">
+              <th style="padding:8px;font-size:11px;text-align:left;">School</th>
+              <th style="padding:8px;font-size:11px;text-align:center;">CROs</th>
+            </tr>${schoolRows}
+          </table></div>`:''}`;
+      return;
+    }
+
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📊</div><p>Dashboard not available for this role.</p></div>`;
+
+  } catch(e){
+    console.error('Dashboard error:',e);
+    el.innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load dashboard. Please try again.</p></div>`;
+  }
+}
+
+// ── TEACHER TABLE SEARCH ───────────────────────────────────────
+function filterTeacherTable(){
+  const q = document.getElementById('teacher-search')?.value.toLowerCase().trim()||'';
+  const rows = document.querySelectorAll('.teacher-stat-row');
+  let visible = 0;
+  rows.forEach(row=>{
+    const name = row.dataset.name||'';
+    const dept = row.dataset.dept||'';
+    const match = !q || name.includes(q) || dept.includes(q);
+    row.style.display = match ? '' : 'none';
+    if(match) visible++;
+  });
+  const noResults = document.getElementById('teacher-no-results');
+  if(noResults) noResults.style.display = visible===0 ? 'block' : 'none';
+}
+
+// ── PARAMETER CHART WITH SCHOOL FILTER ────────────────────────
+function buildManagementLowScores(records){
+  if(!records||!records.length) return '';
+
+  var SCORE_FIELDS=['Area1Score','Area2Score','Area3Score','Area4Score','Area5Score'];
+
+  // Find low score records grouped by school
+  var bySchool = {};
+  records.forEach(function(r){
+    var scores=[];
+    SCORE_FIELDS.forEach(function(f){
+      var s=parseFloat(r[f]);
+      if(!isNaN(s)&&s>0) scores.push(s);
+    });
+    if(scores.length===0) return;
+    var avg = (scores.reduce(function(a,b){return a+b;},0)/scores.length);
+    if(avg >= 2.5) return; // only below 2.5
+    var school = r.SchoolName||'Unknown';
+    if(!bySchool[school]) bySchool[school]=[];
+    bySchool[school].push({
+      teacher: r.TeacherName||r.TeacherEmail||'—',
+      subject: r.Subject||'—',
+      class: (r.Class||'')+' '+(r.Section||''),
+      avg: avg.toFixed(2),
+      grade: getGrade(avg.toFixed(2)),
+      date: r.SubmittedDate||'',
+      observer: r.ObserverName||''
+    });
+  });
+
+  var schools = Object.keys(bySchool);
+  if(!schools.length) return '<div class="card"><div style="font-size:13px;font-weight:700;color:var(--green);padding:4px;">✅ No low score observations across all schools.</div></div>';
+
+  var html = '<div class="card">'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">'
+    + '<div style="width:4px;height:20px;background:var(--red);border-radius:2px;"></div>'
+    + '<span style="font-size:13px;font-weight:700;color:var(--red);">⚠️ Low Score Observations — School-wise (below 2.5)</span>'
+    + '</div>';
+
+  schools.forEach(function(school){
+    var items = bySchool[school];
+    html += '<div style="margin-bottom:14px;">'
+      + '<div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-light);'
+      + 'padding:6px 10px;border-radius:6px;margin-bottom:6px;">'+school+' ('+items.length+' observations)</div>'
+      + '<div style="overflow-x:auto;">'
+      + '<table style="width:100%;border-collapse:collapse;">'
+      + '<tr style="background:#fff3f3;">'
+      + '<th style="padding:6px 8px;font-size:10px;text-align:left;">Teacher</th>'
+      + '<th style="padding:6px 8px;font-size:10px;text-align:left;">Subject</th>'
+      + '<th style="padding:6px 8px;font-size:10px;text-align:left;">Class</th>'
+      + '<th style="padding:6px 8px;font-size:10px;text-align:left;">Observer</th>'
+      + '<th style="padding:6px 8px;font-size:10px;text-align:center;">Avg</th>'
+      + '<th style="padding:6px 8px;font-size:10px;text-align:left;">Grade</th>'
+      + '<th style="padding:6px 8px;font-size:10px;text-align:left;">Date</th>'
+      + '</tr>';
+    items.forEach(function(item){
+      html += '<tr style="border-bottom:1px solid #ffe0e0;">'
+        + '<td style="padding:6px 8px;font-size:12px;font-weight:500;">'+item.teacher+'</td>'
+        + '<td style="padding:6px 8px;font-size:12px;">'+item.subject+'</td>'
+        + '<td style="padding:6px 8px;font-size:12px;">'+item.class+'</td>'
+        + '<td style="padding:6px 8px;font-size:12px;">'+item.observer+'</td>'
+        + '<td style="padding:6px 8px;font-size:13px;text-align:center;font-weight:700;color:var(--red);">'+item.avg+'/4</td>'
+        + '<td style="padding:6px 8px;font-size:11px;color:var(--red);font-weight:600;">'+item.grade+'</td>'
+        + '<td style="padding:6px 8px;font-size:11px;color:var(--gray);">'+(item.date?new Date(item.date).toLocaleDateString('en-IN'):'—')+'</td>'
+        + '</tr>';
+    });
+    html += '</table></div></div>';
+  });
+
+  html += '</div>';
+  return html;
+}
+
+async function downloadMgmtConsolidated(){
+  var schoolFilter = (document.getElementById('mgmt-download-school')||{}).value||'all';
+  if(schoolFilter==='all') schoolFilter='';
+  var btn = event.target;
+  btn.disabled=true; btn.textContent='Generating...';
+  try{
+    var res = await apiGet({action:'getManagementReport',email:APP.user.email,role:APP.user.role,schoolFilter:schoolFilter});
+    if(!res||res.status!=='success'){ toast('Could not generate report','error'); return; }
+    var PARAM_NAMES=['Pedagogy Avg','Student Involvement Avg','Language Avg','Learning Env Avg','Resources Avg'];
+    var headers=['Teacher Name','Department','School','Total CROs'].concat(PARAM_NAMES).concat(['Overall Avg','Grade']);
+    var rows=(res.consolidated||[]).map(function(t){
+      return [t.name,t.department,t.school,t.total].concat(t.paramAvgs||[]).concat([t.overall,t.grade]);
+    });
+    var fname='MGS_CRO_Consolidated_'+(schoolFilter||'All_Schools')+'.xlsx';
+    downloadExcel(rows,headers,fname,'Consolidated');
+  } catch(e){ toast('Error generating report','error'); }
+  finally{ btn.disabled=false; btn.textContent='⬇️ Teacher Consolidated Report'; }
+}
+
+async function downloadMgmtDetailed(){
+  var schoolFilter=(document.getElementById('mgmt-download-school')||{}).value||'all';
+  if(schoolFilter==='all') schoolFilter='';
+  var btn=event.target;
+  btn.disabled=true; btn.textContent='Generating...';
+  try{
+    var res=await apiGet({action:'getManagementReport',email:APP.user.email,role:APP.user.role,schoolFilter:schoolFilter});
+    if(!res||res.status!=='success'){ toast('Could not generate report','error'); return; }
+    var PARAM_NAMES=['Pedagogy','Student Involvement','Language & Terminology','Learning Environment','Resources'];
+    var headers=['Sr.No.','Date','Teacher Name','Department','School','Class','Section','Subject','Observer']
+      .concat(PARAM_NAMES).concat(['Overall Avg','Grade','Good Practices','Areas for Improvement','Support Needed','Follow-up','Status']);
+    var records=res.detailed||[];
+    var rows=records.map(function(r){
+      return [r.srNo,r.date?new Date(r.date).toLocaleDateString('en-IN'):'',
+        r.teacherName,r.department,r.school,r.class,r.section,r.subject,r.observerName]
+        .concat((r.scores||[]).map(function(s){return s||'—';}))
+        .concat([r.overall,r.grade,r.goodPractices,r.areasForImprovement,r.supportNeeded,r.followUpRequired,r.status]);
+    });
+    var fname='MGS_CRO_Detailed_'+(schoolFilter||'All_Schools')+'.xlsx';
+    downloadExcel(rows,headers,fname,'Detailed');
+  } catch(e){ toast('Error generating report','error'); }
+  finally{ btn.disabled=false; btn.textContent='⬇️ Detailed Observations Report'; }
+}
+
+function downloadExcel(data, headers, filename, sheetName){
+  if(typeof XLSX==='undefined'){ toast('Excel library not loaded. Please refresh.','error'); return; }
+  var wsData=[headers].concat(data);
+  var ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols']=headers.map(function(h){return {wch:Math.max((h||'').length+2,12)};});
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,sheetName||'Report');
+  XLSX.writeFile(wb,filename);
+  toast('Excel downloaded ✅','success');
+}
+
+function updateParamChart(){
+  const sel = document.getElementById('param-school-filter');
+  const container = document.getElementById('param-chart-container');
+  if(!sel||!container) return;
+
+  const selectedSchool = sel.value;
+  const AREA_NAMES = [
+    "Implementation of Pedagogy",
+    "Student Involvement",
+    "Language & Subject Terminology",
+    "Learning Environment",
+    "Utility of Resources"
+  ];
+  const SCORE_FIELDS = ["Area1Score","Area2Score","Area3Score","Area4Score","Area5Score"];
+
+  let paramData;
+
+  if(selectedSchool === 'all'){
+    // Use pre-computed param scores
+    paramData = window._mgsDashParamScores || [];
+  } else {
+    // Compute from records for selected school
+    const records = (window._mgsDashRecords||[]).filter(r=>r.SchoolName===selectedSchool);
+    paramData = SCORE_FIELDS.map((field,i)=>{
+      let sum=0; let cnt=0;
+      records.forEach(r=>{
+        const s=parseFloat(r[field]);
+        if(!isNaN(s)&&s>0){sum+=s;cnt++;}
+      });
+      return {name:AREA_NAMES[i], avg:cnt>0?(sum/cnt).toFixed(2):'—', count:cnt};
+    });
+  }
+
+  if(!paramData.length){
+    container.innerHTML=`<div class="empty" style="padding:20px;"><p>No data for selected school.</p></div>`;
+    return;
+  }
+
+  container.innerHTML=`
+    <div style="background:var(--blue-light);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--blue);margin-bottom:14px;">
+      4 = Exemplary &nbsp;|&nbsp; 3 = Proficient &nbsp;|&nbsp; 2 = Progressing &nbsp;|&nbsp; 1 = Beginner
+    </div>
+    ${paramData.map((p,i)=>`
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <span style="font-size:12px;font-weight:600;color:#333;">${i+1}. ${p.name}</span>
+          <span style="font-size:10px;color:var(--gray);background:var(--gray-light);
+            padding:2px 6px;border-radius:10px;">${p.count} obs.</span>
+        </div>
+        ${scoreBar(p.avg)}
+      </div>`).join('')}`;
+}
+
+
+
+
+// ══════════════════════════════════════════════════════
+// TEACHER OBSERVATION TRACKER
+// ══════════════════════════════════════════════════════
+async function renderTeacherTracker(el){
+  el.innerHTML='<div class="loading"><div class="spinner"></div><div>Loading observation tracker...</div></div>';
+  try{
+    var res = await apiGet({
+      action: 'getTrackerData',
+      email: APP.user.email,
+      role: APP.user.role,
+      schoolName: APP.user.schoolName
+    });
+
+    if(!res || res.status !== 'success'){
+      el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load tracker.</p></div>';
+      return;
+    }
+
+    var allTeachers = res.teachers || [];
+    var isMgmt = ['Management','SuperAdmin'].includes(APP.user.role);
+
+    // Get unique schools
+    var schools = ['All Schools'];
+    if(isMgmt){
+      var schoolSet = {};
+      allTeachers.forEach(function(t){ if(t.school) schoolSet[t.school]=1; });
+      schools = schools.concat(Object.keys(schoolSet).sort());
+    }
+
+    // Store all teachers globally
+    window._allTrackerTeachers = allTeachers;
+    window._selectedTrackerSchool = 'All Schools';
+
+    var MONTHS = [
+      {num:6,label:'Jun'},{num:7,label:'Jul'},{num:8,label:'Aug'},
+      {num:9,label:'Sep'},{num:10,label:'Oct'},{num:11,label:'Nov'},
+      {num:12,label:'Dec'},{num:1,label:'Jan'},{num:2,label:'Feb'},
+      {num:3,label:'Mar'},{num:4,label:'Apr'},{num:5,label:'May'}
+    ];
+    window._trackerMonths = MONTHS;
+
+    // Summary stats (all schools)
+    var totalTeachers = allTeachers.length;
+    var observed = allTeachers.filter(function(t){return t.total>0;}).length;
+    var notObserved = totalTeachers - observed;
+    var totalCROs = allTeachers.reduce(function(s,t){return s+t.total;},0);
+
+    // School selector tabs (only for Management/SuperAdmin)
+    var schoolTabs = '';
+    if(isMgmt){
+      schoolTabs = '<div id="school-tab-bar" style="display:flex;flex-wrap:wrap;gap:6px;margin:12px 0;"></div>';
+    }
+
+    el.innerHTML = ''
+      + '<div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px;">'
+      + '<div class="stat-card" style="border-top:3px solid var(--blue);"><div style="font-size:11px;color:var(--gray);margin-bottom:4px;">Total Teachers</div><div style="font-size:24px;font-weight:700;color:var(--blue);">'+totalTeachers+'</div></div>'
+      + '<div class="stat-card" style="border-top:3px solid var(--green);"><div style="font-size:11px;color:var(--gray);margin-bottom:4px;">Observed</div><div style="font-size:24px;font-weight:700;color:var(--green);">'+observed+'</div></div>'
+      + '<div class="stat-card" style="border-top:3px solid var(--orange);"><div style="font-size:11px;color:var(--gray);margin-bottom:4px;">Not Yet Observed</div><div style="font-size:24px;font-weight:700;color:var(--orange);">'+notObserved+'</div></div>'
+      + '<div class="stat-card" style="border-top:3px solid #7b2d8b;"><div style="font-size:11px;color:var(--gray);margin-bottom:4px;">Total CROs</div><div style="font-size:24px;font-weight:700;color:#7b2d8b;">'+totalCROs+'</div></div>'
+      + '</div>'
+      + schoolTabs
+      + '<div class="card" style="padding:12px 14px;">'
+      + '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">'
+      + '<input type="text" id="tracker-search" class="form-control" placeholder="🔍 Search by name, department..." oninput="filterTrackerTable()" style="flex:1;min-width:180px;font-size:13px;"/>'
+      + '<button class="btn-secondary" onclick="exportTrackerCSV()" style="width:auto;padding:9px 14px;font-size:12px;white-space:nowrap;">⬇️ Export CSV</button>'
+      + '</div>'
+      + '<div id="tracker-count" style="font-size:11px;color:var(--gray);margin-top:6px;"></div>'
+      + '</div>'
+      + '<div class="card" style="padding:0;overflow:hidden;">'
+      + '<div style="overflow-x:auto;" id="tracker-table-wrapper"></div>'
+      + '<div id="tracker-no-results" style="display:none;text-align:center;padding:20px;color:var(--gray);">No teachers found.</div>'
+      + '</div>'
+      + '<div style="height:20px;"></div>';
+
+    // Render initial table
+    renderTrackerTable(allTeachers, MONTHS);
+    // Build school tabs dynamically (avoids JS string-in-string issues)
+    if(isMgmt) buildSchoolTabs(schools, 'All Schools');
+    window._trackerData = {teachers: allTeachers, showSchoolCol: isMgmt, MONTHS: MONTHS};
+
+  } catch(e){
+    console.error('Tracker error:', e);
+    el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load tracker.</p></div>';
+  }
+}
+
+function buildSchoolTabs(schools, activeSchool){
+  var bar = document.getElementById('school-tab-bar');
+  if(!bar) return;
+  bar.innerHTML = '';
+  schools.forEach(function(s){
+    var btn = document.createElement('button');
+    btn.textContent = s;
+    btn.id = 'stab-' + s.replace(/\s+/g,'_');
+    btn.style.cssText = 'padding:7px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer;';
+    var isActive = s === activeSchool;
+    btn.style.background = isActive ? 'var(--blue)' : 'var(--blue-light)';
+    btn.style.color = isActive ? 'white' : 'var(--blue)';
+    btn.onclick = function(){ selectTrackerSchool(s); };
+    bar.appendChild(btn);
+  });
+}
+
+function selectTrackerSchool(school){
+  window._selectedTrackerSchool = school;
+  var allTeachers = window._allTrackerTeachers || [];
+  var MONTHS = window._trackerMonths || [];
+  var filtered = school === 'All Schools'
+    ? allTeachers
+    : allTeachers.filter(function(t){return t.school===school;});
+
+  // Update tab styles
+  document.querySelectorAll('[id^="stab-"]').forEach(function(btn){
+    var isActive = btn.textContent.trim() === school;
+    btn.style.background = isActive ? 'var(--blue)' : 'var(--blue-light)';
+    btn.style.color = isActive ? 'white' : 'var(--blue)';
+  });
+
+  renderTrackerTable(filtered, MONTHS);
+  window._trackerData = {teachers: filtered, showSchoolCol: school==='All Schools', MONTHS: MONTHS};
+
+  // Clear search
+  var inp = document.getElementById('tracker-search');
+  if(inp) inp.value = '';
+  var cnt = document.getElementById('tracker-count');
+  if(cnt) cnt.textContent = 'Showing '+filtered.length+' teachers';
+}
+
+function renderTrackerTable(teachers, MONTHS){
+  var isMgmt = ['Management','SuperAdmin'].includes(APP.user.role);
+  var showSchoolCol = isMgmt && (window._selectedTrackerSchool === 'All Schools');
+  var currentMonth = new Date().getMonth() + 1;
+
+  var monthHeaders = MONTHS.map(function(m){
+    var isNow = m.num === currentMonth;
+    return '<th style="padding:7px 4px;font-size:11px;text-align:center;white-space:nowrap;'
+      +(isNow?'background:var(--blue);color:white;':'')+'">'+m.label+'</th>';
+  }).join('');
+
+  var schoolColHeader = showSchoolCol
+    ? '<th style="padding:7px 8px;font-size:11px;text-align:left;white-space:nowrap;">School</th>' : '';
+
+  var tableRows = teachers.map(function(t){
+    var isZero = t.total === 0;
+    var rowStyle = isZero ? 'border-bottom:1px solid var(--border);background:#fafafa;' : 'border-bottom:1px solid var(--border);';
+    var monthCells = MONTHS.map(function(m){
+      var count = (t.months&&t.months[m.num]) || 0;
+      var isNow = m.num === currentMonth;
+      return '<td style="'+(isNow?'background:var(--blue-light);':'')+'text-align:center;padding:6px 4px;font-size:12px;">'
+        +(count>0?'<span style="font-weight:700;color:var(--blue);">'+count+'</span>':'<span style="color:#ccc;">—</span>')+'</td>';
+    }).join('');
+    var schoolCell = showSchoolCol
+      ? '<td style="padding:6px 8px;font-size:11px;color:var(--gray);white-space:nowrap;">'+(t.school||'—')+'</td>' : '';
+    return '<tr class="tracker-row" style="'+rowStyle+'"'
+      +' data-name="'+(t.name||'').toLowerCase()+'"'
+      +' data-dept="'+(t.department||'').toLowerCase()+'">'
+      +'<td style="padding:6px 8px;font-size:13px;font-weight:'+(isZero?'400':'500')+';color:'+(isZero?'var(--gray)':'#333')+';white-space:nowrap;">'+(t.name||'—')+'</td>'
+      +'<td style="padding:6px 8px;font-size:12px;color:var(--gray);white-space:nowrap;">'+(t.department||'—')+'</td>'
+      +schoolCell+monthCells
+      +'<td style="padding:6px 8px;font-size:13px;text-align:center;font-weight:700;color:'+(t.total>0?'var(--blue)':'var(--gray)')+';">'+(t.total||'—')+'</td>'
+      +'</tr>';
+  }).join('');
+
+  var tableHTML = '<table style="width:100%;border-collapse:collapse;min-width:700px;" id="tracker-table">'
+    +'<thead><tr style="background:var(--blue-light);position:sticky;top:0;z-index:10;">'
+    +'<th style="padding:7px 8px;font-size:11px;text-align:left;white-space:nowrap;">Teacher Name</th>'
+    +'<th style="padding:7px 8px;font-size:11px;text-align:left;white-space:nowrap;">Department</th>'
+    +schoolColHeader+monthHeaders
+    +'<th style="padding:7px 8px;font-size:11px;text-align:center;background:var(--blue);color:white;white-space:nowrap;">Total</th>'
+    +'</tr></thead><tbody>'+tableRows+'</tbody></table>';
+
+  var wrapper = document.getElementById('tracker-table-wrapper');
+  if(wrapper) wrapper.innerHTML = tableHTML;
+
+  var cnt = document.getElementById('tracker-count');
+  if(cnt) cnt.textContent = 'Showing '+teachers.length+' teachers';
+}
+
+
+function filterTrackerTable(){
+  const q = (document.getElementById('tracker-search')?.value||'').toLowerCase().trim();
+  const rows = document.querySelectorAll('.tracker-row');
+  let visible = 0;
+  rows.forEach(row=>{
+    const name   = row.dataset.name||'';
+    const dept   = row.dataset.dept||'';
+    const school = row.dataset.school||'';
+    const match  = !q || name.includes(q) || dept.includes(q) || school.includes(q);
+    row.style.display = match ? '' : 'none';
+    if(match) visible++;
+  });
+  const noRes = document.getElementById('tracker-no-results');
+  const count = document.getElementById('tracker-count');
+  if(noRes) noRes.style.display = visible===0 ? 'block' : 'none';
+  if(count) count.textContent = `Showing ${visible} teacher${visible!==1?'s':''}`;
+}
+
+function exportTrackerCSV(){
+  const data = window._trackerData;
+  if(!data) return;
+
+  const { teachers, showSchoolCol, MONTHS } = data;
+  const headers = ['Teacher Name', 'Department'];
+  if(showSchoolCol) headers.push('School');
+  MONTHS.forEach(m => headers.push(m.label));
+  headers.push('Total');
+
+  const rows = [headers.join(',')];
+  teachers.forEach(t=>{
+    const row = [
+      '"'+(t.name||'')+'"',
+      '"'+(t.department||'')+'"'
+    ];
+    if(showSchoolCol) row.push('"'+(t.school||'')+'"');
+    MONTHS.forEach(m => row.push(t.months[m.num]||0));
+    row.push(t.total||0);
+    rows.push(row.join(','));
+  });
+
+  const csv = rows.join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'MGS_CRO_Teacher_Tracker.csv';
+  a.click();
+}
+
+// ══════════════════════════════════════════════════════
+// RC SCHOOL SELECTION
+// ══════════════════════════════════════════════════════
+async function showRCSchoolSelect(){
+  document.getElementById('rc-name').textContent = APP.user.fullName;
+  // Load schools
+  try{
+    const res = await apiGet({action:'getRCSchools'});
+    const schools = res.schools || [];
+    const sel = document.getElementById('rc-school-select');
+    sel.innerHTML = '<option value="">— Select School —</option>' +
+      schools.map(s=>`<option value="${s}">${s}</option>`).join('');
+  } catch(e){ console.error(e); }
+  showScreen('rc-school');
+}
+
+function confirmRCSchool(){
+  const school = document.getElementById('rc-school-select').value;
+  if(!school){ toast('Please select a school','error'); return; }
+  // Override RC user school for this session
+  APP.user.schoolName = school;
+  APP.user.rcSelectedSchool = school;
+  sessionStorage.setItem('mgs_cro_rc_school', school);
+  sessionStorage.setItem('mgs_cro_user', JSON.stringify(APP.user));
+  initApp();
+}
+
+// ══════════════════════════════════════════════════════
+// SEARCHABLE TEACHER DROPDOWN
+// ══════════════════════════════════════════════════════
+function renderSearchableTeacher(teachers){
+  window._cro_teachers = teachers;
+  const optHtml = teachers.map(function(t){
+    const safeEmail = t.teacherEmail || '';
+    const safeName  = (t.teacherName  || '').replace(/'/g, '&#39;');
+    const safeDept  = (t.department   || '').replace(/'/g, '&#39;');
+    return '<div class="teacher-option" data-email="' + safeEmail + '"'
+      + ' data-name="' + safeName + '" data-dept="' + safeDept + '"'
+      + ' onclick="selectTeacherByIdx('+i+')"'
+      + ' style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);">'
+      + '<div style="font-size:13px;font-weight:500;">' + (t.teacherName||'') + '</div>'
+      + '<div style="font-size:11px;color:var(--gray);">' + (t.department||'') + '</div>'
+      + '</div>';
+  }).join('');
+
+  return '<div class="form-group" id="teacher-search-group" style="position:relative;">'
+    + '<label class="form-label">Teacher <span class="req">*</span></label>'
+    + '<input type="text" class="form-control" id="teacher-search-input"'
+    + ' placeholder="Type teacher name to search..."'
+    + ' oninput="filterTeacherOptions()"'
+    + ' onfocus="showTeacherOptions()"'
+    + ' autocomplete="off"/>'
+    + '<input type="hidden" id="f-teacher" value=""/>'
+    + '<div id="teacher-options" style="display:none;position:absolute;z-index:200;'
+    + 'background:white;border:1.5px solid var(--blue-mid);border-radius:8px;'
+    + 'max-height:220px;overflow-y:auto;width:100%;box-shadow:var(--shadow);">'
+    + optHtml
+    + '</div>'
+    + '<div id="teacher-selected" style="display:none;background:var(--blue-light);'
+    + 'border-radius:7px;padding:8px 12px;margin-top:6px;font-size:13px;">'
+    + '<span id="teacher-selected-name"></span>'
+    + '<button onclick="clearTeacherSelection()" style="float:right;background:none;'
+    + 'border:none;color:var(--gray);cursor:pointer;font-size:16px;">&#x2715;</button>'
+    + '</div>'
+    + '</div>';
+}
+
+function showTeacherOptions(){
+  var el=document.getElementById('teacher-options');
+  if(el) el.style.display='block';
+}
+
+async function selectTeacherByIdx(idx){
+  var ts=window._cro_teachers||[];
+  if(idx>=ts.length) return;
+  var t=ts[idx];
+  await selectTeacher(t.teacherEmail,t.teacherName,t.department||'');
+}
+
+function filterTeacherOptions(){
+  const q = document.getElementById('teacher-search-input').value.toLowerCase();
+  const opts = document.querySelectorAll('.teacher-option');
+  const container = document.getElementById('teacher-options');
+  container.style.display = 'block';
+  let visible = 0;
+  opts.forEach(o=>{
+    const name = (o.dataset.name||'').toLowerCase();
+    const dept = (o.dataset.dept||'').toLowerCase();
+    const show = !q || name.includes(q) || dept.includes(q);
+    o.style.display = show ? 'block' : 'none';
+    if(show) visible++;
+  });
+}
+
+async function selectTeacher(email, name, dept){
+  document.getElementById('f-teacher').value = email;
+  document.getElementById('teacher-search-input').value = name;
+  document.getElementById('teacher-options').style.display = 'none';
+  const selDiv = document.getElementById('teacher-selected');
+  if(selDiv){
+    selDiv.style.display = 'flex';
+    document.getElementById('teacher-selected-name').textContent = name + (dept?' — '+dept:'');
+  }
+  // Trigger auto-fill
+  await onTeacherChange();
+}
+
+function clearTeacherSelection(){
+  document.getElementById('f-teacher').value = '';
+  document.getElementById('teacher-search-input').value = '';
+  const selDiv = document.getElementById('teacher-selected');
+  if(selDiv) selDiv.style.display = 'none';
+  document.getElementById('f-class').innerHTML = '<option value="">— Select Teacher First —</option>';
+  document.getElementById('f-section').innerHTML = '<option value="">— Select —</option>';
+  document.getElementById('f-subject').innerHTML = '<option value="">— Select Teacher First —</option>';
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e=>{
+  const grp = document.getElementById('teacher-search-group');
+  const opts = document.getElementById('teacher-options');
+  if(opts && grp && !grp.contains(e.target)){
+    opts.style.display = 'none';
+  }
+});
+
+// ══════════════════════════════════════════════════════
+// GRADE HELPER (frontend)
+// ══════════════════════════════════════════════════════
+function getGrade(avg){
+  const v = parseFloat(avg);
+  if(isNaN(v)) return '—';
+  if(v>=3.5) return 'A — Exemplary';
+  if(v>=2.5) return 'B — Proficient';
+  if(v>=1.5) return 'C — Progressing';
+  return 'D — Beginner';
+}
+
+function gradeColor(avg){
+  const v = parseFloat(avg);
+  if(isNaN(v)) return 'var(--gray)';
+  if(v>=3.5) return '#1e7e34';
+  if(v>=2.5) return '#2e6da4';
+  if(v>=1.5) return '#e67e22';
+  return '#c0392b';
+}
+
+// ══════════════════════════════════════════════════════
+// EXCEL EXPORT HELPERS
+// ══════════════════════════════════════════════════════
+function makeCSV(headers, rows){
+  function esc(v){
+    var s = String(v == null ? '' : v);
+    return '"' + s.split('"').join('""') + '"';
+  }
+  var out = [headers.map(esc).join(',')];
+  for(var i=0;i<rows.length;i++){
+    out.push(rows[i].map(esc).join(','));
+  }
+  return out.join('\r\n');
+}
+function downloadFile(content, filename, mime){
+  const blob = new Blob([content], {type: mime});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+// ── DOWNLOAD TEACHER CONSOLIDATED REPORT ──────────────────────
+async function downloadConsolidatedReport(){
+  const btn = document.getElementById('btn-consolidated');
+  if(btn){ btn.disabled=true; btn.textContent='Generating...'; }
+  try{
+    const res = await apiGet({
+      action:'getConsolidatedReport',
+      email: APP.user.email,
+      role: APP.user.role,
+      schoolName: APP.user.schoolName
+    });
+    if(!res||res.status!=='success'){ toast('Could not generate report','error'); return; }
+
+    const PARAM_NAMES = [
+      'Pedagogy Avg','Student Involvement Avg',
+      'Language & Terminology Avg','Learning Environment Avg','Resources Avg'
+    ];
+    const headers = ['Teacher Name','Department','School','Total CROs',
+      ...PARAM_NAMES,'Overall Avg','Grade'];
+
+    const rows = res.report.map(t=>[
+      t.name, t.department, t.school, t.total,
+      ...t.paramAvgs, t.overall, t.grade
+    ]);
+
+    const csv = makeCSV(headers, rows);
+    const school = APP.user.schoolName.replace(/\s+/g,'_');
+    downloadFile(csv, `MGS_CRO_Teacher_Report_${school}.csv`, 'text/csv');
+    toast('Report downloaded ✅','success');
+  } catch(e){ toast('Error generating report','error'); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent='⬇️ Teacher Consolidated Report'; }}
+}
+
+// ── DOWNLOAD ALL OBSERVATIONS REPORT ──────────────────────────
+async function downloadAllObsReport(){
+  const btn = document.getElementById('btn-all-obs');
+  if(btn){ btn.disabled=true; btn.textContent='Generating...'; }
+  try{
+    const res = await apiGet({
+      action:'getAllObsReport',
+      email: APP.user.email,
+      role: APP.user.role,
+      schoolName: APP.user.schoolName
+    });
+    if(!res||res.status!=='success'){ toast('Could not generate report','error'); return; }
+
+    const PARAM_NAMES = [
+      'Implementation of Pedagogy','Student Involvement',
+      'Language & Subject Terminology','Learning Environment','Utility of Resources'
+    ];
+    const headers = ['Sr.No.','Date','Teacher Name','Department','School',
+      'Class','Section','Subject','Observer Name',
+      ...PARAM_NAMES,'Overall Avg','Grade',
+      'Good Practices','Areas for Improvement','Support Needed',
+      'Follow-up Required','Status'];
+
+    const rows = res.records.map(r=>[
+      r.srNo,
+      r.date ? new Date(r.date).toLocaleDateString('en-IN') : '',
+      r.teacherName, r.department, r.school,
+      r.class, r.section, r.subject, r.observerName,
+      ...(r.scores||[]).map(s=>s||'—'),
+      r.overall, r.grade,
+      r.goodPractices, r.areasForImprovement, r.supportNeeded,
+      r.followUpRequired, r.status
+    ]);
+
+    const csv = makeCSV(headers, rows);
+    const school = APP.user.schoolName.replace(/\s+/g,'_');
+    downloadFile(csv, `MGS_CRO_All_Observations_${school}.csv`, 'text/csv');
+    toast('Report downloaded ✅','success');
+  } catch(e){ toast('Error generating report','error'); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent='⬇️ All Observations Report'; }}
+}
+
+// ══════════════════════════════════════════════════════
+// EXCEL DOWNLOAD HELPERS (SheetJS)
+// ══════════════════════════════════════════════════════
+
+
+
+
+
+
+// ══════════════════════════════════════════════════════
+// PRINCIPAL REPORTS TAB
+// ══════════════════════════════════════════════════════
+async function renderPrincipalReports(el){
+  el.innerHTML='<div class="loading"><div class="spinner"></div><div>Loading reports...</div></div>';
+  try{
+    // Load both reports in parallel
+    var [consRes, detailRes] = await Promise.all([
+      apiGet({action:'getConsolidatedReport', email:APP.user.email, role:APP.user.role, schoolName:APP.user.schoolName}),
+      apiGet({action:'getAllObsReport', email:APP.user.email, role:APP.user.role, schoolName:APP.user.schoolName})
+    ]);
+
+    var consReport = consRes.report || [];
+    var detailRecords = detailRes.records || [];
+
+    // Build teachers list for filter dropdown
+    var teacherNames = [...new Set(detailRecords.map(function(r){return r.teacherName||'';}).filter(Boolean))].sort();
+
+    el.innerHTML = buildPrincipalReportsHTML(consReport, detailRecords, teacherNames);
+
+    // Store for filtering
+    window._principalDetailed = detailRecords;
+    window._principalConsolidated = consReport;
+
+    // Render initial detailed table
+    renderDetailedTable(detailRecords);
+
+  } catch(e){
+    console.error(e);
+    el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load reports. Please redeploy Apps Script.</p></div>';
+  }
+}
+
+function buildPrincipalReportsHTML(consReport, detailRecords, teacherNames){
+  var PARAM_NAMES = ['Pedagogy Avg','Student Involvement Avg','Language Avg','Learning Env Avg','Resources Avg'];
+
+  // Build consolidated table rows
+  var consRows = '';
+  for(var i=0;i<consReport.length;i++){
+    var t = consReport[i];
+    var col = gradeColor(t.overall);
+    consRows += '<tr style="border-bottom:1px solid var(--border);">'
+      + '<td style="padding:7px 8px;font-size:13px;font-weight:500;">'+(t.name||'')+'</td>'
+      + '<td style="padding:7px 8px;font-size:12px;color:var(--gray);">'+(t.department||'')+'</td>'
+      + '<td style="padding:7px 8px;font-size:12px;color:var(--gray);">'+(t.school||'')+'</td>'
+      + '<td style="padding:7px 8px;font-size:13px;text-align:center;font-weight:700;color:var(--blue);">'+(t.total||0)+'</td>'
+      + (t.paramAvgs||[]).map(function(a){
+          return '<td style="padding:7px 6px;font-size:12px;text-align:center;color:'+gradeColor(a)+';font-weight:600;">'+(a||'—')+'</td>';
+        }).join('')
+      + '<td style="padding:7px 8px;font-size:13px;text-align:center;font-weight:700;color:'+col+';">'+(t.overall||'—')+'</td>'
+      + '<td style="padding:7px 8px;font-size:11px;color:'+col+';font-weight:600;">'+(t.grade||'—')+'</td>'
+      + '</tr>';
+  }
+
+  var teacherOpts = '<option value="">All Teachers</option>'
+    + teacherNames.map(function(n){return '<option value="'+n+'">'+n+'</option>';}).join('');
+
+  var MONTHS = [{l:'Jun',v:6},{l:'Jul',v:7},{l:'Aug',v:8},{l:'Sep',v:9},{l:'Oct',v:10},
+    {l:'Nov',v:11},{l:'Dec',v:12},{l:'Jan',v:1},{l:'Feb',v:2},{l:'Mar',v:3},{l:'Apr',v:4},{l:'May',v:5}];
+  var monthOpts = '<option value="">All Months</option>'
+    + MONTHS.map(function(m){return '<option value="'+m.v+'">'+m.l+'</option>';}).join('');
+
+  return '<div style="font-size:14px;font-weight:700;color:var(--blue);margin-bottom:14px;">School Reports — '+APP.user.schoolName+'</div>'
+
+    // ── ACCORDION 1: Consolidated ──
+    + '<div class="card" style="padding:0;margin-bottom:12px;">'
+    + '<div onclick="toggleAccordion(this.dataset.panel)\" data-panel=\"acc-cons" style="padding:14px 16px;cursor:pointer;'
+    + 'display:flex;justify-content:space-between;align-items:center;'
+    + 'border-radius:var(--radius);">'
+    + '<div>'
+    + '<div style="font-size:14px;font-weight:700;color:var(--blue);">📊 Teacher Consolidated Report</div>'
+    + '<div style="font-size:11px;color:var(--gray);margin-top:2px;">One row per teacher — parameter averages and grade</div>'
+    + '</div>'
+    + '<span id="acc-cons-icon" style="font-size:18px;color:var(--blue);">▶</span>'
+    + '</div>'
+    + '<div id="acc-cons" style="display:none;border-top:1px solid var(--border);padding:14px;">'
+    // Search for consolidated
+    + '<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">'
+    + '<input type="text" id="cons-search" class="form-control" placeholder="🔍 Search teacher or department..." oninput="filterConsTable()" style="flex:1;font-size:13px;"/>'
+    + '<button onclick="downloadConsolidated()" style="background:var(--green);color:white;border:none;border-radius:7px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">⬇️ Excel</button>'
+    + '</div>'
+    + (consRows
+      ? '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;min-width:800px;" id="cons-table">'
+        + '<thead><tr style="background:var(--blue-light);">'
+        + '<th style="padding:7px 8px;font-size:11px;text-align:left;">Teacher</th>'
+        + '<th style="padding:7px 8px;font-size:11px;text-align:left;">Dept</th>'
+        + '<th style="padding:7px 8px;font-size:11px;text-align:left;">School</th>'
+        + '<th style="padding:7px 8px;font-size:11px;text-align:center;">CROs</th>'
+        + PARAM_NAMES.map(function(p){return '<th style="padding:7px 5px;font-size:10px;text-align:center;">'+p+'</th>';}).join('')
+        + '<th style="padding:7px 6px;font-size:11px;text-align:center;background:var(--blue);color:white;">Overall</th>'
+        + '<th style="padding:7px 6px;font-size:11px;text-align:left;">Grade</th>'
+        + '</tr></thead>'
+        + '<tbody id="cons-tbody">'+consRows+'</tbody>'
+        + '</table></div>'
+      : '<div class="empty" style="padding:20px;"><p>No teacher data available.</p></div>')
+    + '</div>'
+    + '</div>'
+
+    // ── ACCORDION 2: Detailed ──
+    + '<div class="card" style="padding:0;margin-bottom:12px;">'
+    + '<div onclick="toggleAccordion(this.dataset.panel)\" data-panel=\"acc-detail" style="padding:14px 16px;cursor:pointer;'
+    + 'display:flex;justify-content:space-between;align-items:center;">'
+    + '<div>'
+    + '<div style="font-size:14px;font-weight:700;color:var(--blue);">📋 Detailed Observation Report</div>'
+    + '<div style="font-size:11px;color:var(--gray);margin-top:2px;">All CROs with full details — filterable and downloadable</div>'
+    + '</div>'
+    + '<span id="acc-detail-icon" style="font-size:18px;color:var(--blue);">▶</span>'
+    + '</div>'
+    + '<div id="acc-detail" style="display:none;border-top:1px solid var(--border);padding:14px;">'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px;">'
+    + '<select class="form-control" id="filter-teacher" onchange="applyDetailedFilter()" style="font-size:12px;">'+teacherOpts+'</select>'
+    + '<select class="form-control" id="filter-month" onchange="applyDetailedFilter()" style="font-size:12px;">'+monthOpts+'</select>'
+    + '<input type="date" class="form-control" id="filter-from" onchange="applyDetailedFilter()" style="font-size:12px;"/>'
+    + '<input type="date" class="form-control" id="filter-to" onchange="applyDetailedFilter()" style="font-size:12px;"/>'
+    + '</div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
+    + '<div id="filter-count" style="font-size:11px;color:var(--gray);"></div>'
+    + '<button onclick="downloadDetailed()" style="background:var(--green);color:white;border:none;border-radius:7px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;">⬇️ Excel</button>'
+    + '</div>'
+    + '<div id="detailed-table-container" style="overflow-x:auto;"></div>'
+    + '</div>'
+    + '</div>';
+}
+
+function toggleAccordion(id){
+  var panel = document.getElementById(id);
+  var icon  = document.getElementById(id+'-icon');
+  if(!panel) return;
+  var isOpen = panel.style.display !== 'none';
+  // Close all accordions first
+  ['acc-cons','acc-detail'].forEach(function(aid){
+    var p = document.getElementById(aid);
+    var ic = document.getElementById(aid+'-icon');
+    if(p) p.style.display = 'none';
+    if(ic) ic.textContent = '▶';
+  });
+  // Open clicked one if it was closed
+  if(!isOpen){
+    panel.style.display = 'block';
+    if(icon) icon.textContent = '▼';
+    // Load detailed table when opened
+    if(id === 'acc-detail'){
+      var count = document.getElementById('filter-count');
+      if(count) count.textContent = '';
+      applyDetailedFilter();
+    }
+  }
+}
+
+function filterConsTable(){
+  var q = (document.getElementById('cons-search')||{}).value||'';
+  q = q.toLowerCase().trim();
+  var rows = document.querySelectorAll('#cons-tbody tr');
+  var visible = 0;
+  rows.forEach(function(row){
+    var text = row.textContent.toLowerCase();
+    var show = !q || text.includes(q);
+    row.style.display = show ? '' : 'none';
+    if(show) visible++;
+  });
+}
+
+
+function applyDetailedFilter(){
+  var all = window._principalDetailed || [];
+  var teacher = (document.getElementById('filter-teacher')||{}).value||'';
+  var month = (document.getElementById('filter-month')||{}).value||'';
+  var from = (document.getElementById('filter-from')||{}).value||'';
+  var to = (document.getElementById('filter-to')||{}).value||'';
+
+  var filtered = all.filter(function(r){
+    if(teacher && r.teacherName !== teacher) return false;
+    if(month){
+      var d = r.date ? new Date(r.date) : null;
+      if(!d || (d.getMonth()+1) !== parseInt(month)) return false;
+    }
+    if(from){
+      var d = r.date ? new Date(r.date) : null;
+      if(!d || d < new Date(from)) return false;
+    }
+    if(to){
+      var d = r.date ? new Date(r.date) : null;
+      if(!d || d > new Date(to)) return false;
+    }
+    return true;
+  });
+
+  var countEl = document.getElementById('filter-count');
+  if(countEl) countEl.textContent = 'Showing '+filtered.length+' of '+all.length+' observations';
+
+  renderDetailedTable(filtered);
+  window._filteredDetailed = filtered;
+}
+
+function renderDetailedTable(records){
+  var container = document.getElementById('detailed-table-container');
+  if(!container) return;
+
+  if(!records.length){
+    container.innerHTML = '<div class="empty" style="padding:20px;"><p>No observations match the selected filters.</p></div>';
+    return;
+  }
+
+  var PARAM_SHORT = ['Pedagogy','Student Invt.','Language','Learning Env','Resources'];
+  var rows = '';
+  for(var i=0;i<records.length;i++){
+    var r = records[i];
+    var scores = (r.scores||[]).map(function(s){
+      return '<td style="padding:6px 5px;font-size:12px;text-align:center;font-weight:600;color:'
+        +(s?gradeColor(s):'var(--gray)')+';">'+(s||'—')+'</td>';
+    }).join('');
+    var col = gradeColor(r.overall);
+    rows += '<tr style="border-bottom:1px solid var(--border);">'
+      + '<td style="padding:6px 8px;font-size:11px;color:var(--gray);text-align:center;">'+(r.srNo||i+1)+'</td>'
+      + '<td style="padding:6px 8px;font-size:12px;white-space:nowrap;">'+(r.date?new Date(r.date).toLocaleDateString('en-IN'):'—')+'</td>'
+      + '<td style="padding:6px 8px;font-size:13px;font-weight:500;white-space:nowrap;">'+(r.teacherName||'')+'</td>'
+      + '<td style="padding:6px 8px;font-size:12px;color:var(--gray);">'+(r.department||'')+'</td>'
+      + '<td style="padding:6px 8px;font-size:12px;white-space:nowrap;">'+(r.class||'')+' '+(r.section||'')+'</td>'
+      + '<td style="padding:6px 8px;font-size:12px;">'+(r.subject||'')+'</td>'
+      + '<td style="padding:6px 8px;font-size:12px;white-space:nowrap;">'+(r.observerName||'')+'</td>'
+      + scores
+      + '<td style="padding:6px 8px;font-size:12px;text-align:center;font-weight:700;color:'+col+';">'+(r.overall||'—')+'</td>'
+      + '<td style="padding:6px 8px;font-size:11px;color:'+col+';font-weight:600;white-space:nowrap;">'+(r.grade||'—')+'</td>'
+      + '</tr>';
+  }
+
+  container.innerHTML = '<table style="width:100%;border-collapse:collapse;min-width:1000px;">'
+    + '<thead><tr style="background:var(--blue-light);">'
+    + '<th style="padding:7px 8px;font-size:10px;text-align:center;">#</th>'
+    + '<th style="padding:7px 8px;font-size:10px;">Date</th>'
+    + '<th style="padding:7px 8px;font-size:10px;">Teacher</th>'
+    + '<th style="padding:7px 8px;font-size:10px;">Dept</th>'
+    + '<th style="padding:7px 8px;font-size:10px;">Class</th>'
+    + '<th style="padding:7px 8px;font-size:10px;">Subject</th>'
+    + '<th style="padding:7px 8px;font-size:10px;">Observer</th>'
+    + PARAM_SHORT.map(function(p){return '<th style="padding:7px 5px;font-size:10px;text-align:center;">'+p+'</th>';}).join('')
+    + '<th style="padding:7px 6px;font-size:10px;text-align:center;background:var(--blue);color:white;">Avg</th>'
+    + '<th style="padding:7px 6px;font-size:10px;">Grade</th>'
+    + '</tr></thead>'
+    + '<tbody>'+rows+'</tbody>'
+    + '</table>';
+}
+
+function downloadConsolidated(){
+  var report = window._principalConsolidated||[];
+  if(!report.length){ toast('No data to download','error'); return; }
+  var PARAM_NAMES=['Pedagogy Avg','Student Involvement Avg','Language Avg','Learning Env Avg','Resources Avg'];
+  var headers=['Teacher Name','Department','School','Total CROs'].concat(PARAM_NAMES).concat(['Overall Avg','Grade']);
+  var rows = report.map(function(t){
+    return [t.name,t.department,t.school,t.total]
+      .concat(t.paramAvgs||[])
+      .concat([t.overall,t.grade]);
+  });
+  downloadExcel(rows, headers, 'MGS_CRO_Consolidated_'+APP.user.schoolName.replace(/\s+/g,'_')+'.xlsx','Consolidated');
+}
+
+function downloadDetailed(){
+  var records = window._filteredDetailed||window._principalDetailed||[];
+  if(!records.length){ toast('No data to download','error'); return; }
+  var PARAM_NAMES=['Pedagogy','Student Involvement','Language & Terminology','Learning Environment','Resources'];
+  var headers=['Sr.No.','Date','Teacher Name','Department','School','Class','Section','Subject','Observer']
+    .concat(PARAM_NAMES)
+    .concat(['Overall Avg','Grade','Good Practices','Areas for Improvement','Support Needed','Follow-up','Status']);
+  var rows = records.map(function(r){
+    return [r.srNo,r.date?new Date(r.date).toLocaleDateString('en-IN'):'',
+      r.teacherName,r.department,r.school,r.class,r.section,r.subject,r.observerName]
+      .concat((r.scores||[]).map(function(s){return s||'—';}))
+      .concat([r.overall,r.grade,r.goodPractices,r.areasForImprovement,r.supportNeeded,r.followUpRequired,r.status]);
+  });
+  downloadExcel(rows, headers, 'MGS_CRO_Detailed_'+APP.user.schoolName.replace(/\s+/g,'_')+'.xlsx','Detailed');
+}
+
+
+// ══════════════════════════════════════════════════════
+// MANAGE USERS
+// ══════════════════════════════════════════════════════
+function renderManageUsers(el){
+  const isSA=APP.user.role==='SuperAdmin';
+  const schools=['SOS Atrey','SOS Wana','SOS Wardha','SOS CUBS Ram Nagar','SOS CUBS Pratap Nagar'];
+  el.innerHTML=`
+    <div class="card">
+      <div class="card-title">Add New User</div>
+      <div class="form-group"><label class="form-label">Full Name <span class="req">*</span></label>
+        <input class="form-control" id="nu-name" placeholder="Full name"/></div>
+      <div class="form-group"><label class="form-label">Email <span class="req">*</span></label>
+        <input class="form-control" id="nu-email" placeholder="email@mgsnagpur.org"/></div>
+      <div class="form-group"><label class="form-label">Role <span class="req">*</span></label>
+        <select class="form-control" id="nu-role">
+          <option value="">— Select Role —</option>
+          ${isSA?'<option>SuperAdmin</option><option>Management</option>':''}
+          <option>Principal</option><option>VicePrincipal</option><option>PPHead</option>
+          <option>CoordinatorPrimary</option><option>CoordinatorHighSchool</option>
+          <option>Supervisor</option><option>SchoolAdmin</option><option>Teacher</option>
+        </select></div>
+      <div class="form-group"><label class="form-label">School <span class="req">*</span></label>
+        <select class="form-control" id="nu-school">
+          ${isSA?schools.map(s=>`<option>${s}</option>`).join(''):`<option>${APP.user.schoolName}</option>`}
+        </select></div>
+      <div class="form-group"><label class="form-label">Department / Subject</label>
+        <input class="form-control" id="nu-dept" placeholder="e.g. English, Maths (optional)"/></div>
+      <button class="btn-submit" onclick="addUser()">➕ Add User</button>
+    </div>`;
+}
+
+async function addUser(){
+  const name=document.getElementById('nu-name').value.trim();
+  const email=document.getElementById('nu-email').value.trim();
+  const role=document.getElementById('nu-role').value;
+  const school=document.getElementById('nu-school').value;
+  if(!name||!email||!role||!school){ toast('Please fill all required fields','error'); return; }
+  if(!email.endsWith('@mgsnagpur.org')){ toast('Email must be @mgsnagpur.org','error'); return; }
+  try{
+    const res=await apiPost({action:'addUser',fullName:name,email,role,schoolName:school,department:document.getElementById('nu-dept').value,addedBy:APP.user.email});
+    if(res.status==='success'){ toast('User added ✅','success'); document.getElementById('nu-name').value=''; document.getElementById('nu-email').value=''; document.getElementById('nu-dept').value=''; }
+    else toast('Error: '+res.message,'error');
+  } catch(e){ toast('Connection error','error'); }
+}
+
+// ══════════════════════════════════════════════════════
+// BULK UPLOAD
+// ══════════════════════════════════════════════════════
+function renderBulkUpload(el){
+  el.innerHTML=`
+    <div class="card">
+      <div class="card-title">⬆️ Bulk Upload Users</div>
+      <div class="info-box"><strong>Required CSV columns:</strong><br><br>FullName, Email, Role, SchoolName, Department</div>
+      <div class="form-group" style="margin-top:12px;">
+        <label class="form-label">Select CSV File</label>
+        <input type="file" accept=".csv" class="form-control" id="csv-file" onchange="previewCSV()"/>
+      </div>
+      <div id="csv-preview" style="font-size:12px;color:var(--gray);margin:6px 0;"></div>
+      <button class="btn-submit" id="btn-upload" onclick="uploadCSV()" disabled>⬆️ Upload Users</button>
+    </div>
+    <div class="card">
+      <div class="card-title">📥 Download Template</div>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:10px;">Download a ready-to-fill CSV template.</p>
+      <button class="btn-secondary" onclick="downloadTemplate()">📥 Download Template</button>
+    </div>`;
+}
+
+function previewCSV(){
+  const file=document.getElementById('csv-file').files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.split('\n').filter(l=>l.trim());
+    document.getElementById('csv-preview').textContent=`${lines.length-1} records found (excluding header)`;
+    document.getElementById('btn-upload').disabled=false;
+  };
+  reader.readAsText(file);
+}
+
+async function uploadCSV(){
+  const file=document.getElementById('csv-file').files[0];
+  if(!file) return;
+  const btn=document.getElementById('btn-upload');
+  btn.disabled=true; btn.textContent='Uploading...';
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    const lines=e.target.result.split('\n').filter(l=>l.trim());
+    const headers=lines[0].split(',').map(h=>h.trim().replace(/"/g,''));
+    const users=[];
+    for(let i=1;i<lines.length;i++){
+      const vals=lines[i].split(',').map(v=>v.trim().replace(/"/g,''));
+      if(!vals[0]) continue;
+      const user={};
+      headers.forEach((h,idx)=>user[h]=vals[idx]||'');
+      users.push(user);
+    }
+    try{
+      const res=await apiPost({action:'bulkUpload',users,uploadedBy:APP.user.email});
+      if(res.status==='success') toast(`✅ ${res.usersAdded} users uploaded`,'success');
+      else toast('Upload failed: '+res.message,'error');
+    } catch(err){ toast('Connection error during upload','error'); }
+    btn.disabled=false; btn.textContent='⬆️ Upload Users';
+  };
+  reader.readAsText(file);
+}
+
+function downloadTemplate(){
+  const h='FullName,Email,Role,SchoolName,Department';
+  const s='Priya Kumar,priya.kumar@mgsnagpur.org,Teacher,SOS Atrey,English';
+  const blob=new Blob([h+'\n'+s],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='MGS_CRO_User_Template.csv';
+  a.click();
+}
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.getRegistrations()
+      .then(regs => regs.forEach(reg => reg.unregister()))
+      .catch(e => console.log('SW unregister error:', e));
+    if(window.caches){
+      caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+    }
+  });
+}
+</script>
+</body>
+</html>
